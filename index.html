@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROMANO CASINO | Молодежный клуб</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-green: #00ff00;
+            --neon-purple: #bf00ff;
+            --dark-bg: #0f0f1a;
+            --card-bg: #1a1a2e;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .main-nav {
+            background: var(--card-bg);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .game-content {
+            display: none;
+        }
+
+        .game-content.active {
+            display: block;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #aaa;
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .user-info {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .coins-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        .bet-controls {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+
+        .bet-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .bet-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid var(--neon-blue);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .bet-btn.active {
+            background: var(--neon-blue);
+        }
+
+        .current-bet {
+            text-align: center;
+            color: var(--neon-green);
+        }
+
+        .casino-game {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #ff0000;
+            text-transform: uppercase;
+        }
+
+        .slots-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 2px solid #ff0000;
+            min-height: 300px;
+            align-items: center;
+        }
+
+        .slot-column {
+            width: 100px;
+            height: 270px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slot-strip {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 2s ease-out;
+        }
+
+        .slot-item {
+            width: 80px;
+            height: 80px;
+            margin: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .spin-btn {
+            background: linear-gradient(45deg, #ff0000, #ff6b6b);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 1.1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 15px auto;
+            display: block;
+            font-weight: bold;
+        }
+
+        .spin-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .crash-game {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .crash-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #00ff00;
+            text-transform: uppercase;
+        }
+
+        .crash-graph {
+            background: rgba(0, 0, 0, 0.3);
+            height: 200px;
+            border-radius: 10px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--neon-blue);
+        }
+
+        .crash-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--neon-green);
+            transform-origin: left center;
+            transform: scaleX(0);
+            transition: transform 0.1s linear;
+        }
+
+        .crash-multiplier {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        .crash-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .crash-bet-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .crash-bet-btn, .crash-cashout-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .crash-bet-btn {
+            background: linear-gradient(45deg, var(--neon-green), #00cc00);
+            color: white;
+        }
+
+        .crash-bet-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .crash-cashout-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff0000);
+            color: white;
+            display: none;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-stats {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--neon-blue);
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .admin-access {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 10000;
+            display: none;
+        }
+
+        .admin-trigger {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .admin-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--neon-blue);
+            z-index: 10001;
+            display: none;
+            min-width: 400px;
+        }
+
+        .admin-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: none;
+        }
+
+        .admin-input-group {
+            margin-bottom: 15px;
+        }
+
+        .admin-input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--neon-blue);
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--neon-blue);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .admin-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .admin-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .admin-add-btn {
+            background: linear-gradient(45deg, var(--neon-green), #00cc00);
+            color: white;
+        }
+
+        .admin-close-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff0000);
+            color: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--neon-green), #00cc00);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 10000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-access" id="adminAccess">
+        <button class="admin-trigger" onclick="showAdminPanel()">ADMIN</button>
+    </div>
+
+    <div class="admin-overlay" id="adminOverlay" onclick="hideAdminPanel()"></div>
+    
+    <div class="admin-panel" id="adminPanel">
+        <h3 style="text-align: center; margin-bottom: 20px; color: var(--neon-blue);">
+            <i class="fas fa-user-shield"></i> АДМИН-ПАНЕЛЬ
+        </h3>
+        <div class="admin-controls">
+            <div class="admin-input-group">
+                <label for="adminUserId"><i class="fas fa-id-card"></i> ID пользователя:</label>
+                <input type="text" id="adminUserId" class="admin-input" placeholder="Введите ID пользователя">
+            </div>
+            <div class="admin-input-group">
+                <label for="adminCoinsAmount"><i class="fas fa-coins"></i> Количество монет:</label>
+                <input type="number" id="adminCoinsAmount" class="admin-input" value="1000" min="1" max="100000">
+            </div>
+            <div class="admin-buttons">
+                <button class="admin-btn admin-add-btn" onclick="adminAddCoins()">
+                    <i class="fas fa-plus"></i> ВЫДАТЬ МОНЕТЫ
+                </button>
+                <button class="admin-btn admin-close-btn" onclick="hideAdminPanel()">
+                    <i class="fas fa-times"></i> ЗАКРЫТЬ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <nav class="main-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="slots">
+                    <i class="fas fa-sliders-h"></i>СЛОТЫ
+                </button>
+                <button class="nav-tab" data-tab="crash">
+                    <i class="fas fa-chart-line"></i>КРАШ
+                </button>
+                <button class="nav-tab" data-tab="profile">
+                    <i class="fas fa-user"></i>ПРОФИЛЬ
+                </button>
+            </div>
+        </nav>
+
+        <header>
+            <div class="logo">ROMANO CASINO</div>
+            <div class="subtitle">РИСКУЙ С УМОМ • ПРОИГРЫВАЙ СТИЛЬНО</div>
+            
+            <div class="user-info">
+                <div class="user-id">
+                    <i class="fas fa-id-card"></i>
+                    <span>ID: <strong id="userId">Гость_001</strong></span>
+                </div>
+                <div class="coins-display">
+                    <i class="fas fa-coins"></i>
+                    <span id="coinsBalance">100</span> монет
+                </div>
+            </div>
+        </header>
+
+        <!-- SLOTS GAME -->
+        <div id="slots-content" class="game-content active">
+            <div class="bet-controls">
+                <h3><i class="fas fa-coins"></i> ВЫБЕРИ СТАВКУ</h3>
+                <div class="bet-buttons">
+                    <button class="bet-btn active" data-bet="10">10 🪙</button>
+                    <button class="bet-btn" data-bet="25">25 🪙</button>
+                    <button class="bet-btn" data-bet="50">50 🪙</button>
+                    <button class="bet-btn" data-bet="100">100 🪙</button>
+                </div>
+                <div class="current-bet">
+                    Текущая ставка: <span id="currentBet">10</span> монет
+                </div>
+            </div>
+
+            <div class="casino-game">
+                <h2 class="game-title">ДЕПНИ ВСЕ!</h2>
+                <div class="slot-machine">
+                    <div class="slots-container">
+                        <div class="slot-column">
+                            <div class="slot-strip" id="slotStrip1"></div>
+                        </div>
+                        <div class="slot-column">
+                            <div class="slot-strip" id="slotStrip2"></div>
+                        </div>
+                        <div class="slot-column">
+                            <div class="slot-strip" id="slotStrip3"></div>
+                        </div>
+                    </div>
+                    
+                    <button id="spinBtn" class="spin-btn">
+                        <i class="fas fa-play"></i> КРУТИТЬ ЗА <span id="spinCost">10</span> МОНЕТ
+                    </button>
+                    
+                    <div id="result" class="result"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CRASH GAME -->
+        <div id="crash-content" class="game-content">
+            <div class="bet-controls">
+                <h3><i class="fas fa-coins"></i> ВЫБЕРИ СТАВКУ</h3>
+                <div class="bet-buttons">
+                    <button class="bet-btn active" data-bet="10">10 🪙</button>
+                    <button class="bet-btn" data-bet="25">25 🪙</button>
+                    <button class="bet-btn" data-bet="50">50 🪙</button>
+                    <button class="bet-btn" data-bet="100">100 🪙</button>
+                </div>
+                <div class="current-bet">
+                    Текущая ставка: <span id="crashCurrentBet">10</span> монет
+                </div>
+            </div>
+
+            <div class="crash-game">
+                <h2 class="crash-title">КРАШ ИГРА</h2>
+                
+                <div class="crash-graph">
+                    <div class="crash-line"></div>
+                    <div class="crash-multiplier">1.00x</div>
+                </div>
+                
+                <div class="crash-controls">
+                    <input type="number" class="crash-bet-input" id="crashBetAmount" value="10" min="10" max="100">
+                    <button class="crash-bet-btn" id="crashBetBtn">
+                        <i class="fas fa-play"></i> СДЕЛАТЬ СТАВКУ
+                    </button>
+                    <button class="crash-cashout-btn" id="crashCashoutBtn">
+                        <i class="fas fa-hand-holding-usd"></i> ЗАБРАТЬ
+                    </button>
+                </div>
+                
+                <div id="crashResult" class="result">
+                    Сделайте ставку чтобы начать игру!
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div id="profile-content" class="game-content">
+            <div class="profile-stats">
+                <h2 class="profile-title">ВАШ ПРОФИЛЬ</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-id-card"></i>
+                        <div class="stat-value" id="profileUserId">Гость_001</div>
+                        <div class="stat-label">ВАШ ID</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-coins"></i>
+                        <div class="stat-value" id="profileBalance">100</div>
+                        <div class="stat-label">ТЕКУЩИЙ БАЛАНС</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <div class="stat-value" id="totalWins">0</div>
+                        <div class="stat-label">ОБЩИЙ ВЫИГРЫШ</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-chart-bar"></i>
+                        <div class="stat-value" id="totalSpins">0</div>
+                        <div class="stat-label">ВСЕГО СПИНОВ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== ОСНОВНЫЕ ПЕРЕМЕННЫЕ ==========
+        let coins = 100;
+        let currentBet = 10;
+        let crashCurrentBet = 10;
+        const symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '👑', '⭐', '🔷'];
+        const slotHeight = 88;
+
+        let playerStats = {
+            totalWins: 0,
+            totalLosses: 0,
+            totalSpins: 0,
+            jackpotsWon: 0
+        };
+
+        let userDisplayId = 'Гость_001';
+
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function updateUI() {
+            document.getElementById('coinsBalance').textContent = coins;
+            document.getElementById('userId').textContent = userDisplayId;
+            document.getElementById('profileUserId').textContent = userDisplayId;
+            document.getElementById('profileBalance').textContent = coins;
+            document.getElementById('totalWins').textContent = playerStats.totalWins;
+            document.getElementById('totalSpins').textContent = playerStats.totalSpins;
+        }
+
+        // ========== СИСТЕМА НАВИГАЦИИ ==========
+        function initializeNavigation() {
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const gameContents = document.querySelectorAll('.game-content');
+            
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.dataset.tab;
+                    
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    gameContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${targetTab}-content`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+        }
+
+        // ========== ИГРА В СЛОТЫ ==========
+        function initializeBetControls() {
+            const betButtons = document.querySelectorAll('.bet-btn');
+            betButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    betButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentBet = parseInt(this.dataset.bet);
+                    document.getElementById('currentBet').textContent = currentBet;
+                    document.getElementById('spinCost').textContent = currentBet;
+                });
+            });
+        }
+
+        function initializeSlots() {
+            const strips = [document.getElementById('slotStrip1'), 
+                           document.getElementById('slotStrip2'), 
+                           document.getElementById('slotStrip3')];
+            
+            strips.forEach(strip => {
+                strip.innerHTML = '';
+                // Начальная позиция
+                strip.style.transform = 'translateY(0)';
+                
+                for (let i = 0; i < 15; i++) {
+                    const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    const slotItem = document.createElement('div');
+                    slotItem.className = 'slot-item';
+                    slotItem.textContent = symbol;
+                    strip.appendChild(slotItem);
+                }
+            });
+        }
+
+        function getSpinResult() {
+            const random = Math.random();
+            if (random < 0.4) {
+                // Проигрыш
+                return [
+                    symbols[Math.floor(Math.random() * symbols.length)],
+                    symbols[Math.floor(Math.random() * symbols.length)],
+                    symbols[Math.floor(Math.random() * symbols.length)]
+                ];
+            } else if (random < 0.7) {
+                // Маленький выигрыш (2 одинаковых)
+                const symbol = symbols[Math.floor(Math.random() * 6)];
+                return [symbol, symbol, symbols[Math.floor(Math.random() * symbols.length)]];
+            } else {
+                // Большой выигрыш (3 одинаковых)
+                const symbol = symbols[Math.floor(Math.random() * 6)];
+                return [symbol, symbol, symbol];
+            }
+        }
+
+        function spinSlots(resultSymbols, callback) {
+            const strips = [document.getElementById('slotStrip1'), 
+                           document.getElementById('slotStrip2'), 
+                           document.getElementById('slotStrip3')];
+            
+            const spinDuration = 2000;
+            const startTime = Date.now();
+            
+            strips.forEach((strip, index) => {
+                const targetPosition = -5 * slotHeight;
+                
+                function animate() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / spinDuration, 1);
+                    
+                    strip.style.transform = `translateY(${targetPosition * progress}px)`;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        setTimeout(callback, 300);
+                    }
+                }
+                
+                animate();
+            });
+        }
+
+        function initializeSlotsGame() {
+            initializeBetControls();
+            initializeSlots();
+            
+            const spinBtn = document.getElementById('spinBtn');
+            const resultDiv = document.getElementById('result');
+            const coinsDisplay = document.getElementById('coinsBalance');
+            
+            spinBtn.addEventListener('click', function() {
+                if (coins < currentBet) {
+                    resultDiv.innerHTML = `<div style="color:#ff6b6b;">НЕТ ДЕНЕГ! Нужно ${currentBet} монет.</div>`;
+                    return;
+                }
+                
+                spinBtn.disabled = true;
+                resultDiv.innerHTML = `КРУТИМ...`;
+                
+                coins -= currentBet;
+                playerStats.totalSpins++;
+                coinsDisplay.textContent = coins;
+                
+                const result = getSpinResult();
+                
+                spinSlots(result, function() {
+                    let winAmount = 0;
+                    let message = '';
+                    
+                    if (result[0] === result[1] && result[1] === result[2]) {
+                        winAmount = currentBet * 5;
+                        message = `🎉 ДЖЕКПОТ! Выигрыш: ${winAmount} монет!`;
+                        playerStats.jackpotsWon++;
+                    } else if (result[0] === result[1] || result[1] === result[2] || result[0] === result[2]) {
+                        winAmount = currentBet * 2;
+                        message = `🎊 ВЫИГРЫШ! Выигрыш: ${winAmount} монет!`;
+                    } else {
+                        message = "💸 ПРОИГРЫШ! Попробуй еще раз!";
+                        playerStats.totalLosses += currentBet;
+                    }
+                    
+                    if (winAmount > 0) {
+                        coins += winAmount;
+                        playerStats.totalWins += winAmount;
+                        showNotification(`💰 +${winAmount} монет!`);
+                    }
+                    
+                    coinsDisplay.textContent = coins;
+                    updateUI();
+                    
+                    resultDiv.innerHTML = `${message}<br>Баланс: ${coins} монет`;
+                    spinBtn.disabled = false;
+                    
+                    // Переинициализируем слоты для следующего вращения
+                    initializeSlots();
+                });
+            });
+        }
+
+        // ========== КРАШ ИГРА ==========
+        function initializeCrashGame() {
+            let crashGameActive = false;
+            let currentMultiplier = 1.00;
+            let crashPoint = 0;
+            let playerBet = 0;
+            let crashInterval;
+            
+            const crashBetBtn = document.getElementById('crashBetBtn');
+            const crashCashoutBtn = document.getElementById('crashCashoutBtn');
+            const crashBetAmount = document.getElementById('crashBetAmount');
+            const crashMultiplier = document.querySelector('.crash-multiplier');
+            const crashLine = document.querySelector('.crash-line');
+            const crashResult = document.getElementById('crashResult');
+            const coinsDisplay = document.getElementById('coinsBalance');
+            const crashCurrentBetElement = document.getElementById('crashCurrentBet');
+            
+            // Обработчики ставок
+            const betButtons = document.querySelectorAll('#crash-content .bet-btn');
+            betButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    betButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    crashCurrentBet = parseInt(this.dataset.bet);
+                    crashCurrentBetElement.textContent = crashCurrentBet;
+                    crashBetAmount.value = crashCurrentBet;
+                });
+            });
+            
+            crashBetAmount.addEventListener('input', function() {
+                const value = parseInt(this.value) || 10;
+                crashCurrentBet = Math.max(10, Math.min(100, value));
+                crashCurrentBetElement.textContent = crashCurrentBet;
+                this.value = crashCurrentBet;
+            });
+            
+            // Кнопка ставки
+            crashBetBtn.addEventListener('click', function() {
+                if (crashGameActive) return;
+                
+                const betAmount = crashCurrentBet;
+                if (coins < betAmount) {
+                    crashResult.innerHTML = `<div style="color:#ff6b6b;">НЕТ ДЕНЕГ! Нужно ${betAmount} монет.</div>`;
+                    return;
+                }
+                
+                playerBet = betAmount;
+                coins -= playerBet;
+                coinsDisplay.textContent = coins;
+                updateUI();
+                
+                crashGameActive = true;
+                crashBetBtn.disabled = true;
+                crashCashoutBtn.style.display = 'block';
+                currentMultiplier = 1.00;
+                
+                // Генерируем точку краша
+                crashPoint = 1.5 + Math.random() * 8.5;
+                
+                crashResult.innerHTML = `График растет...`;
+                
+                crashInterval = setInterval(function() {
+                    currentMultiplier += 0.01;
+                    crashMultiplier.textContent = currentMultiplier.toFixed(2) + 'x';
+                    crashLine.style.transform = `scaleX(${Math.min(currentMultiplier / 10, 1)})`;
+                    
+                    if (currentMultiplier >= crashPoint) {
+                        endCrashGame(false);
+                    }
+                }, 100);
+            });
+            
+            // Кнопка вывода
+            crashCashoutBtn.addEventListener('click', function() {
+                if (!crashGameActive) return;
+                endCrashGame(true);
+            });
+            
+            function endCrashGame(manualCashout) {
+                clearInterval(crashInterval);
+                crashGameActive = false;
+                crashBetBtn.disabled = false;
+                crashCashoutBtn.style.display = 'none';
+                
+                if (manualCashout) {
+                    const winAmount = Math.floor(playerBet * currentMultiplier);
+                    coins += winAmount;
+                    playerStats.totalWins += winAmount;
+                    crashResult.innerHTML = `🎉 УСПЕХ! Вы забрали ${winAmount} монет (${currentMultiplier.toFixed(2)}x)`;
+                    showNotification(`💰 +${winAmount} монет!`);
+                } else {
+                    crashResult.innerHTML = `💥 КРАШ! Мультипликатор упал на ${crashPoint.toFixed(2)}x`;
+                    playerStats.totalLosses += playerBet;
+                }
+                
+                coinsDisplay.textContent = coins;
+                updateUI();
+                crashLine.style.transform = 'scaleX(0)';
+            }
+        }
+
+        // ========== АДМИН ПАНЕЛЬ ==========
+        function showAdminPanel() {
+            if (userDisplayId === 'Гость_001') {
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('adminOverlay').style.display = 'block';
+            }
+        }
+
+        function hideAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminOverlay').style.display = 'none';
+        }
+
+        function adminAddCoins() {
+            const userId = document.getElementById('adminUserId').value.trim();
+            const amount = parseInt(document.getElementById('adminCoinsAmount').value);
+            
+            if (!userId) {
+                alert('Введите ID пользователя!');
+                return;
+            }
+            
+            if (isNaN(amount) || amount <= 0) {
+                alert('Введите корректное количество монет!');
+                return;
+            }
+            
+            if (userId === userDisplayId) {
+                coins += amount;
+                updateUI();
+                showNotification(`✅ Вам выдано ${amount} монет!`);
+                hideAdminPanel();
+            } else {
+                showNotification('❌ Пользователь не найден!');
+            }
+        }
+
+        function checkAndShowAdminPanel() {
+            const adminAccess = document.getElementById('adminAccess');
+            if (adminAccess) {
+                adminAccess.style.display = (userDisplayId === 'Гость_001') ? 'block' : 'none';
+            }
+        }
+
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNavigation();
+           
+            initializeSlotsGame();
+            initializeCrashGame();
+            checkAndShowAdminPanel();
+            updateUI();
+
+            console.log('🎰 ROMANO CASINO запущен!');
+        });
+    </script>
+</body>
+</html>
