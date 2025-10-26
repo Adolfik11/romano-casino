@@ -2060,6 +2060,7 @@
 
         // ========== АДМИН ПАНЕЛЬ ==========
         function showAdminPanel() {
+            if (userDisplayId === 'User_eyJhbGci') {
             document.getElementById('adminPanel').style.display = 'block';
             document.getElementById('adminOverlay').style.display = 'block';
             document.getElementById('adminUserId').value = '';
@@ -2161,4 +2162,5 @@
         });
     </script>
 </body>
+
 </html>
