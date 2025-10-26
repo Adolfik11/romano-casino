@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROMANO CASINO | Молодежный клуб</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-green: #00ff00;
+            --neon-purple: #bf00ff;
+            --dark-bg: #0f0f1a;
+            --card-bg: #1a1a2e;
+            --accent: #6a11cb;
+            --warning: #ff6b35;
+            --success: #00cc66;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(106, 17, 203, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 20%),
+                var(--dark-bg);
+        }
+
+        .warning-banner {
+            background: linear-gradient(45deg, var(--warning), #ff8c42);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .main-nav {
+            background: var(--card-bg);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--neon-blue);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-tab:hover::before {
+            width: 80%;
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tab.active::before {
+            width: 100%;
+            background: var(--neon-green);
+        }
+
+        .game-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .game-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .user-info {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .coins-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        .google-login-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-profile-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-blue);
+        }
+
+        .user-details {
+            text-align: left;
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        .user-email {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .logout-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff0000);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .bet-controls {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .bet-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .bet-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid var(--neon-blue);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .bet-btn.active {
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .casino-game {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .slots-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            position: relative;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 2px solid var(--neon-blue);
+            min-height: 300px;
+            align-items: center;
+        }
+
+        .slot-column {
+            width: 100px;
+            height: 270px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slot-strip {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 2.5s cubic-bezier(0.2, 0.8, 0.3, 1);
+        }
+
+        .slot-item {
+            width: 80px;
+            height: 80px;
+            margin: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .spin-btn {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 1.1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 15px auto;
+            display: block;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .spin-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .spin-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .crash-game {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .crash-graph {
+            background: rgba(0, 0, 0, 0.3);
+            height: 200px;
+            border-radius: 10px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--neon-blue);
+        }
+
+        .crash-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--neon-green);
+            transform-origin: left center;
+            transform: scaleX(0);
+            transition: transform 0.1s linear;
+        }
+
+        .crash-multiplier {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        .crash-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .crash-bet-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .crash-bet-btn, .crash-cashout-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .crash-bet-btn {
+            background: linear-gradient(45deg, var(--neon-green), var(--success));
+            color: white;
+        }
+
+        .crash-bet-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .crash-cashout-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff0000);
+            color: white;
+            display: none;
+        }
+
+        .crash-cashout-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #ff0000;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-stats {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--neon-blue);
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .admin-access {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 10000;
+            display: none;
+        }
+
+        .admin-trigger {
+            background: linear-gradient(45deg, var(--warning), #ff8c42);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 15px var(--warning);
+        }
+
+        .admin-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--neon-blue);
+            z-index: 10001;
+            display: none;
+            min-width: 400px;
+        }
+
+        .admin-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: none;
+        }
+
+        .admin-input-group {
+            margin-bottom: 15px;
+        }
+
+        .admin-input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--neon-blue);
+            font-weight: bold;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--neon-blue);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .admin-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .admin-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-add-btn {
+            background: linear-gradient(45deg, var(--success), var(--neon-green));
+            color: white;
+        }
+
+        .admin-close-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff0000);
+            color: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--neon-green), var(--success));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 10000;
+            font-weight: bold;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, #ff6b6b, #ff0000);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .game-history {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .history-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-win {
+            border-left: 4px solid var(--success);
+        }
+
+        .history-loss {
+            border-left: 4px solid #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="warning-banner">
+        ⚠️ ВНИМАНИЕ: Это демонстрационная версия! Реальные ставки не принимаются. Играйте ответственно!
+    </div>
+
+    <div class="admin-access" id="adminAccess">
+        <button class="admin-trigger" onclick="showAdminPanel()">
+            <i class="fas fa-user-shield"></i> АДМИН
+        </button>
+    </div>
+
+    <div class="admin-overlay" id="adminOverlay" onclick="hideAdminPanel()"></div>
+    
+    <div class="admin-panel" id="adminPanel">
+        <h3 style="text-align: center; margin-bottom: 20px; color: var(--neon-blue);">
+            <i class="fas fa-user-shield"></i> АДМИН-ПАНЕЛЬ
+        </h3>
+        <div class="admin-controls">
+            <div class="admin-input-group">
+                <label for="adminUserId"><i class="fas fa-id-card"></i> ID пользователя:</label>
+                <input type="text" id="adminUserId" class="admin-input" placeholder="Введите ID пользователя">
+            </div>
+            <div class="admin-input-group">
+                <label for="adminCoinsAmount"><i class="fas fa-coins"></i> Количество монет:</label>
+                <input type="number" id="adminCoinsAmount" class="admin-input" value="1000" min="1" max="100000">
+            </div>
+            <div class="admin-buttons">
+                <button class="admin-btn admin-add-btn" onclick="adminAddCoins()">
+                    <i class="fas fa-plus"></i> ВЫДАТЬ МОНЕТЫ
+                </button>
+                <button class="admin-btn admin-close-btn" onclick="hideAdminPanel()">
+                    <i class="fas fa-times"></i> ЗАКРЫТЬ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <nav class="main-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="slots">
+                    <i class="fas fa-sliders-h"></i> СЛОТЫ
+                </button>
+                <button class="nav-tab" data-tab="crash">
+                    <i class="fas fa-chart-line"></i> КРАШ
+                </button>
+                <button class="nav-tab" data-tab="profile">
+                    <i class="fas fa-user"></i> ПРОФИЛЬ
+                </button>
+            </div>
+        </nav>
+
+        <header>
+            <div class="logo">ROMANO CASINO</div>
+            <div class="subtitle">ДЕМО-ВЕРСИЯ • ИГРАЙ ОТВЕТСТВЕННО</div>
+            
+            <div class="user-info">
+                <div class="user-id">
+                    <i class="fas fa-id-card"></i>
+                    <span>ID: <strong id="userId">Гость_001</strong></span>
+                </div>
+                <div class="coins-display">
+                    <i class="fas fa-coins"></i>
+                    <span id="coinsBalance">100</span> монет
+                </div>
+            </div>
+        </header>
+
+        <!-- SLOTS GAME -->
+        <div id="slots-content" class="game-content active">
+            <div class="bet-controls">
+                <h3><i class="fas fa-coins"></i> ВЫБЕРИ СТАВКУ</h3>
+                <div class="bet-buttons">
+                    <button class="bet-btn active" data-bet="10">10 🪙</button>
+                    <button class="bet-btn" data-bet="25">25 🪙</button>
+                    <button class="bet-btn" data-bet="50">50 🪙</button>
+                    <button class="bet-btn" data-bet="100">100 🪙</button>
+                </div>
+                <div class="current-bet">
+                    Текущая ставка: <span id="currentBet">10</span> монет
+                </div>
+            </div>
+
+            <div class="casino-game">
+                <h2 class="game-title">🎰 ИГРОВЫЕ АВТОМАТЫ</h2>
+                <div class="slot-machine">
+                    <div class="slots-container">
+                        <div class="slot-column">
+                            <div class="slot-strip" id="slotStrip1"></div>
+                        </div>
+                        <div class="slot-column">
+                            <div class="slot-strip" id="slotStrip2"></div>
+                        </div>
+                        <div class="slot-column">
+                            <div class="slot-strip" id="slotStrip3"></div>
+                        </div>
+                    </div>
+                    
+                    <button id="spinBtn" class="spin-btn">
+                        <i class="fas fa-play"></i> КРУТИТЬ ЗА <span id="spinCost">10</span> МОНЕТ
+                    </button>
+                    
+                    <div id="result" class="result"></div>
+                </div>
+
+                <div class="game-history">
+                    <h4><i class="fas fa-history"></i> ИСТОРИЯ ИГР</h4>
+                    <div class="history-list" id="slotsHistory"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CRASH GAME -->
+        <div id="crash-content" class="game-content">
+            <div class="bet-controls">
+                <h3><i class="fas fa-coins"></i> ВЫБЕРИ СТАВКУ</h3>
+                <div class="bet-buttons">
+                    <button class="bet-btn active" data-bet="10">10 🪙</button>
+                    <button class="bet-btn" data-bet="25">25 🪙</button>
+                    <button class="bet-btn" data-bet="50">50 🪙</button>
+                    <button class="bet-btn" data-bet="100">100 🪙</button>
+                </div>
+                <div class="current-bet">
+                    Текущая ставка: <span id="crashCurrentBet">10</span> монет
+                </div>
+            </div>
+
+            <div class="crash-game">
+                <h2 class="crash-title">📈 КРАШ ИГРА</h2>
+                
+                <div class="crash-graph">
+                    <div class="crash-line"></div>
+                    <div class="crash-multiplier">1.00x</div>
+                </div>
+                
+                <div class="crash-controls">
+                    <input type="number" class="crash-bet-input" id="crashBetAmount" value="10" min="10" max="100">
+                    <button class="crash-bet-btn" id="crashBetBtn">
+                        <i class="fas fa-play"></i> СДЕЛАТЬ СТАВКУ
+                    </button>
+                    <button class="crash-cashout-btn" id="crashCashoutBtn">
+                        <i class="fas fa-hand-holding-usd"></i> ЗАБРАТЬ
+                    </button>
+                </div>
+                
+                <div id="crashResult" class="result">
+                    Сделайте ставку чтобы начать игру!
+                </div>
+
+                <div class="game-history">
+                    <h4><i class="fas fa-history"></i> ИСТОРИЯ КРАШЕЙ</h4>
+                    <div class="history-list" id="crashHistory"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div id="profile-content" class="game-content">
+            <div class="google-login-section">
+                <h3><i class="fab fa-google"></i> СИНХРОНИЗАЦИЯ ПРОГРЕССА</h3>
+                <div id="googleLoginButton">
+                    <div id="g_id_onload"
+                         data-client_id="377095072144-q5i0g55qd172en2t6i0ebcbcdiad65h6.apps.googleusercontent.com"
+                         data-context="signin"
+                         data-ux_mode="popup"
+                         data-callback="handleGoogleSignIn"
+                         data-auto_prompt="false">
+                    </div>
+
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-shape="rectangular"
+                         data-theme="filled_blue"
+                         data-text="signin_with"
+                         data-size="large"
+                         data-locale="ru"
+                         data-width="300">
+                    </div>
+                    <p style="margin-top: 10px; color: #aaa;">Войдите через Google чтобы сохранять прогресс в облако</p>
+                </div>
+                
+                <div id="googleUserInfo" style="display: none;">
+                    <div class="user-profile-info">
+                        <img class="user-avatar" id="userAvatar" src="" alt="Аватар">
+                        <div class="user-details">
+                            <div class="user-name" id="userName">Имя пользователя</div>
+                            <div class="user-email" id="userEmail">email@example.com</div>
+                            <button class="logout-btn" onclick="googleLogout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+                        </div>
+                    </div>
+                    <p style="margin-top: 10px; color: var(--neon-green);" id="syncStatus"><i class="fas fa-check-circle"></i> Прогресс синхронизирован</p>
+                </div>
+            </div>
+
+            <div class="profile-stats">
+                <h2 class="profile-title">📊 ВАШ ПРОФИЛЬ</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-id-card"></i>
+                        <div class="stat-value" id="profileUserId">Гость_001</div>
+                        <div class="stat-label">ВАШ ID</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-coins"></i>
+                        <div class="stat-value" id="profileBalance">100</div>
+                        <div class="stat-label">ТЕКУЩИЙ БАЛАНС</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <div class="stat-value" id="totalWins">0</div>
+                        <div class="stat-label">ОБЩИЙ ВЫИГРЫШ</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-chart-bar"></i>
+                        <div class="stat-value" id="totalSpins">0</div>
+                        <div class="stat-label">ВСЕГО СПИНОВ</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-percentage"></i>
+                        <div class="stat-value" id="winRate">0%</div>
+                        <div class="stat-label">ПРОЦЕНТ ВЫИГРЫШЕЙ</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-crown"></i>
+                        <div class="stat-value" id="jackpotsWon">0</div>
+                        <div class="stat-label">ДЖЕКПОТОВ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== БЕЗОПАСНАЯ КОНФИГУРАЦИЯ ==========
+        const ADMIN_USER_ID = btoa('admin_' + Math.random().toString(36)).substring(0, 16);
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_ACTUAL_SCRIPT_ID/exec';
+
+        // ========== УЛУЧШЕННЫЕ ПЕРЕМЕННЫЕ ==========
+        let coins = 100;
+        let currentBet = 10;
+        let crashCurrentBet = 10;
+        const symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '👑', '⭐', '🔷'];
+        const slotHeight = 88;
+
+        let playerStats = {
+            totalWins: 0,
+            totalLosses: 0,
+            totalSpins: 0,
+            jackpotsWon: 0,
+            gamesPlayed: 0,
+            totalWagered: 0
+        };
+
+        let gameHistory = {
+            slots: [],
+            crash: []
+        };
+
+        let googleUser = null;
+        let isGoogleAuthenticated = false;
+        let userDisplayId = 'Гость_' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+        // ========== УЛУЧШЕННАЯ СИСТЕМА СОХРАНЕНИЯ ==========
+        function generateUserHash() {
+            return btoa(userDisplayId + '_' + Date.now()).substring(0, 12);
+        }
+
+        async function saveToCloud() {
+            if (!isGoogleAuthenticated || !googleUser) {
+                return saveToLocalStorage();
+            }
+
+            try {
+                const userData = {
+                    userId: googleUser.id,
+                    displayId: userDisplayId,
+                    coins: coins,
+                    stats: playerStats,
+                    history: gameHistory,
+                    userHash: generateUserHash(),
+                    lastSave: new Date().toISOString()
+                };
+
+                // В реальном приложении здесь был бы запрос к серверу
+                console.log('Cloud save simulation:', userData);
+                
+                // Имитируем задержку сети
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                updateSyncStatus('✅ Данные сохранены в облако');
+                saveToLocalStorage(); // Резервное сохранение
+                return true;
+            } catch (error) {
+                console.error('Cloud save error:', error);
+                updateSyncStatus('❌ Ошибка синхронизации');
+                saveToLocalStorage();
+                return false;
+            }
+        }
+
+        async function loadFromCloud() {
+            if (!isGoogleAuthenticated || !googleUser) {
+                return loadFromLocalStorage();
+            }
+
+            try {
+                // Имитируем загрузку с сервера
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                // В реальном приложении здесь был бы запрос к серверу
+                const saved = localStorage.getItem('romanoCasinoData');
+                if (saved) {
+                    const userData = JSON.parse(saved);
+                    if (userData.userHash) {
+                        coins = userData.coins || 100;
+                        playerStats = userData.stats || playerStats;
+                        gameHistory = userData.history || gameHistory;
+                        userDisplayId = userData.displayId || userDisplayId;
+                        
+                        updateUI();
+                        updateSyncStatus('✅ Данные загружены из облака');
+                        return true;
+                    }
+                }
+                throw new Error('No valid cloud data');
+            } catch (error) {
+                console.error('Cloud load error:', error);
+                return loadFromLocalStorage();
+            }
+        }
+
+        function saveToLocalStorage() {
+            const userData = { 
+                coins: coins, 
+                stats: playerStats,
+                history: gameHistory,
+                userId: userDisplayId,
+                userHash: generateUserHash(),
+                lastSave: new Date().toISOString()
+            };
+            localStorage.setItem('romanoCasinoData', JSON.stringify(userData));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('romanoCasinoData');
+            if (saved) {
+                try {
+                    const userData = JSON.parse(saved);
+                    coins = userData.coins || 100;
+                    playerStats = userData.stats || playerStats;
+                    gameHistory = userData.history || gameHistory;
+                    userDisplayId = userData.userId || userDisplayId;
+                    updateUI();
+                    updateSyncStatus('✅ Данные загружены из кеша');
+                    return true;
+                } catch (e) {
+                    console.error('Error loading local data:', e);
+                }
+            }
+            return false;
+        }
+
+        // ========== УЛУЧШЕННАЯ GOOGLE AUTH ==========
+        function handleGoogleSignIn(response) {
+            try {
+                googleUser = {
+                    id: response.credential,
+                    name: response.name,
+                    email: response.email,
+                    picture: response.picture
+                };
+                
+                isGoogleAuthenticated = true;
+                localStorage.setItem('googleUser', JSON.stringify(googleUser));
+                
+                showGoogleUserInfo();
+                updateUserDisplay();
+                
+                loadFromCloud().then(() => {
+                    showNotification('✅ Успешный вход через Google!');
+                });
+            } catch (error) {
+                console.error('Google auth error:', error);
+                showNotification('❌ Ошибка входа через Google', 'error');
+            }
+        }
+
+        function googleLogout() {
+            saveToCloud().then(() => {
+                googleUser = null;
+                isGoogleAuthenticated = false;
+                localStorage.removeItem('googleUser');
+                showGoogleLoginButton();
+                updateUserDisplay();
+                showNotification('🔒 Вы вышли из аккаунта');
+            });
+        }
+
+        function showGoogleLoginButton() {
+            document.getElementById('googleLoginButton').style.display = 'block';
+            document.getElementById('googleUserInfo').style.display = 'none';
+        }
+
+        function showGoogleUserInfo() {
+            document.getElementById('googleLoginButton').style.display = 'none';
+            document.getElementById('googleUserInfo').style.display = 'block';
+            
+            if (googleUser) {
+                document.getElementById('userAvatar').src = googleUser.picture;
+                document.getElementById('userName').textContent = googleUser.name;
+                document.getElementById('userEmail').textContent = googleUser.email;
+            }
+        }
+
+        function updateSyncStatus(message) {
+            const status = document.getElementById('syncStatus');
+            if (status) {
+                status.textContent = message;
+                status.style.color = message.includes('❌') ? '#ff6b6b' : 'var(--neon-green)';
+            }
+        }
+
+        // ========== УЛУЧШЕННЫЕ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function updateUI() {
+            document.getElementById('coinsBalance').textContent = coins;
+            document.getElementById('userId').textContent = userDisplayId;
+            document.getElementById('profileUserId').textContent = userDisplayId;
+            document.getElementById('profileBalance').textContent = coins;
+            document.getElementById('totalWins').textContent = playerStats.totalWins;
+            document.getElementById('totalSpins').textContent = playerStats.totalSpins;
+            document.getElementById('jackpotsWon').textContent = playerStats.jackpotsWon;
+            
+            const totalGames = playerStats.totalSpins + (playerStats.gamesPlayed || 0);
+            const winRate = totalGames > 0 ? Math.round((playerStats.totalWins / totalGames) * 100) : 0;
+            document.getElementById('winRate').textContent = winRate + '%';
+            
+            updateHistoryDisplays();
+        }
+
+        function addGameHistory(type, result) {
+            const historyItem = {
+                type: type,
+                result: result,
+                timestamp: new Date().toLocaleTimeString(),
+                bet: type === 'slots' ? currentBet : crashCurrentBet,
+                balance: coins
+            };
+            
+            gameHistory[type].unshift(historyItem);
+            if (gameHistory[type].length > 10) {
+                gameHistory[type].pop();
+            }
+            
+            updateHistoryDisplays();
+            saveToCloud();
+        }
+
+        function updateHistoryDisplays() {
+            // История слотов
+            const slotsHistory = document.getElementById('slotsHistory');
+            if (slotsHistory) {
+                slotsHistory.innerHTML = gameHistory.slots.map(item => `
+                    <div class="history-item ${item.result.includes('ВЫИГРЫШ') ? 'history-win' : 'history-loss'}">
+                        <span>${item.timestamp}</span>
+                        <span>${item.result.split('<br>')[0]}</span>
+                    </div>
+                `).join('') || '<div style="text-align: center; color: #666;">История игр пуста</div>';
+            }
+            
+            // История краша
+            const crashHistory = document.getElementById('crashHistory');
+            if (crashHistory) {
+                crashHistory.innerHTML = gameHistory.crash.map(item => `
+                    <div class="history-item ${item.result.includes('УСПЕХ') ? 'history-win' : 'history-loss'}">
+                        <span>${item.timestamp}</span>
+                        <span>${item.result.split('<br>')[0]}</span>
+                    </div>
+                `).join('') || '<div style="text-align: center; color: #666;">История игр пуста</div>';
+            }
+        }
+
+        // ========== УЛУЧШЕННАЯ СИСТЕМА НАВИГАЦИИ ==========
+        function initializeNavigation() {
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const gameContents = document.querySelectorAll('.game-content');
+            
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.dataset.tab;
+                    
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    gameContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${targetTab}-content`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+        }
+
+        // ========== УЛУЧШЕННАЯ ИГРА В СЛОТЫ ==========
+        function initializeBetControls() {
+            const betButtons = document.querySelectorAll('.bet-btn');
+            betButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    betButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentBet = parseInt(this.dataset.bet);
+                    document.getElementById('currentBet').textContent = currentBet;
+                    document.getElementById('spinCost').textContent = currentBet;
+                });
+            });
+        }
+
+        function initializeSlots() {
+            const strips = [document.getElementById('slotStrip1'), 
+                           document.getElementById('slotStrip2'), 
+                           document.getElementById('slotStrip3')];
+            
+            strips.forEach(strip => {
+                strip.innerHTML = '';
+                for (let i = 0; i < 15; i++) {
+                    const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    const slotItem = document.createElement('div');
+                    slotItem.className = 'slot-item';
+                    slotItem.textContent = symbol;
+                    strip.appendChild(slotItem);
+                }
+            });
+        }
+
+        function getSpinResult() {
+            const random = Math.random();
+            
+            // РЕАЛИСТИЧНЫЕ ВЕРОЯТНОСТИ:
+            if (random < 0.6) { // 60% - проигрыш
+                return [
+                    symbols[Math.floor(Math.random() * symbols.length)],
+                    symbols[Math.floor(Math.random() * symbols.length)],
+                    symbols[Math.floor(Math.random() * symbols.length)]
+                ];
+            } else if (random < 0.9) { // 30% - частичный выигрыш
+                const symbol = symbols[Math.floor(Math.random() * 6)];
+                return [symbol, symbol, symbols[Math.floor(Math.random() * symbols.length)]];
+            } else { // 10% - джекпот
+                const symbol = symbols[Math.floor(Math.random() * 6)];
+                return [symbol, symbol, symbol];
+            }
+        }
+
+        function spinSlots(resultSymbols, callback) {
+            const strips = [document.getElementById('slotStrip1'), 
+                           document.getElementById('slotStrip2'), 
+                           document.getElementById('slotStrip3')];
+            
+            const spinDuration = 2000;
+            const startTime = Date.now();
+            
+            strips.forEach((strip, index) => {
+                const targetPosition = -4 * slotHeight;
+                
+                function animate() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / spinDuration, 1);
+                    
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    strip.style.transform = `translateY(${targetPosition * easeOut}px)`;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        setTimeout(() => {
+                            strip.innerHTML = '';
+                            for (let i = 0; i < 15; i++) {
+                                const symbol = (i === 4) ? resultSymbols[index] : symbols[Math.floor(Math.random() * symbols.length)];
+                                const slotItem = document.createElement('div');
+                                slotItem.className = 'slot-item';
+                                slotItem.textContent = symbol;
+                                strip.appendChild(slotItem);
+                            }
+                            strip.style.transform = 'translateY(0)';
+                            
+                            if (index === 2) callback();
+                        }, 300);
+                    }
+                }
+                
+                animate();
+            });
+        }
+
+        function initializeSlotsGame() {
+            initializeBetControls();
+            initializeSlots();
+            
+            const spinBtn = document.getElementById('spinBtn');
+            const resultDiv = document.getElementById('result');
+            const coinsDisplay = document.getElementById('coinsBalance');
+            
+            spinBtn.addEventListener('click', async function() {
+                if (coins < currentBet) {
+                    resultDiv.innerHTML = `<div style="color:#ff6b6b;">❌ НЕДОСТАТОЧНО СРЕДСТВ! Нужно ${currentBet} монет.</div>`;
+                    return;
+                }
+                
+                spinBtn.disabled = true;
+                spinBtn.innerHTML = `<span class="loading"></span> КРУТИМ...`;
+                
+                coins -= currentBet;
+                playerStats.totalSpins++;
+                playerStats.totalWagered += currentBet;
+                coinsDisplay.textContent = coins;
+                
+                const result = getSpinResult();
+                
+                spinSlots(result, function() {
+                    let winAmount = 0;
+                    let message = '';
+                    
+                    if (result[0] === result[1] && result[1] === result[2]) {
+                        winAmount = currentBet * 10; // Увеличен множитель для редкости
+                        message = `🎉 ДЖЕКПОТ! Выигрыш: ${winAmount} монет!`;
+                        playerStats.jackpotsWon++;
+                    } else if (result[0] === result[1] || result[1] === result[2] || result[0] === result[2]) {
+                        winAmount = currentBet * 2;
+                        message = `🎊 ВЫИГРЫШ! Выигрыш: ${winAmount} монет!`;
+                    } else {
+                        message = "💸 ПРОИГРЫШ! Попробуй еще раз!";
+                        playerStats.totalLosses += currentBet;
+                    }
+                    
+                    if (winAmount > 0) {
+                        coins += winAmount;
+                        playerStats.totalWins += winAmount;
+                        showNotification(`💰 +${winAmount} монет!`);
+                    }
+                    
+                    coinsDisplay.textContent = coins;
+                    
+                    // Сохраняем в историю
+                    addGameHistory('slots', message);
+                    
+                    saveToCloud();
+                    updateUI();
+                    
+                    resultDiv.innerHTML = `${message}<br>Баланс: ${coins} монет`;
+                    spinBtn.disabled = false;
+                    spinBtn.innerHTML = `<i class="fas fa-play"></i> КРУТИТЬ ЗА <span id="spinCost">${currentBet}</span> МОНЕТ`;
+                    
+                    initializeSlots();
+                });
+            });
+        }
+
+        // ========== УЛУЧШЕННАЯ КРАШ ИГРА ==========
+        function initializeCrashGame() {
+            let crashGameActive = false;
+            let currentMultiplier = 1.00;
+            let crashPoint = 0;
+            let playerBet = 0;
+            let crashInterval;
+            
+            const crashBetBtn = document.getElementById('crashBetBtn');
+            const crashCashoutBtn = document.getElementById('crashCashoutBtn');
+            const crashBetAmount = document.getElementById('crashBetAmount');
+            const crashMultiplier = document.querySelector('.crash-multiplier');
+            const crashLine = document.querySelector('.crash-line');
+            const crashResult = document.getElementById('crashResult');
+            const coinsDisplay = document.getElementById('coinsBalance');
+            const crashCurrentBetElement = document.getElementById('crashCurrentBet');
+            
+            const betButtons = document.querySelectorAll('#crash-content .bet-btn');
+            betButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    betButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    crashCurrentBet = parseInt(this.dataset.bet);
+                    crashCurrentBetElement.textContent = crashCurrentBet;
+                    crashBetAmount.value = crashCurrentBet;
+                });
+            });
+            
+            crashBetAmount.addEventListener('input', function() {
+                const value = parseInt(this.value) || 10;
+                crashCurrentBet = Math.max(10, Math.min(100, value));
+                crashCurrentBetElement.textContent = crashCurrentBet;
+                this.value = crashCurrentBet;
+            });
+            
+            crashBetBtn.addEventListener('click', function() {
+                if (crashGameActive) return;
+                
+                const betAmount = crashCurrentBet;
+                if (coins < betAmount) {
+                    crashResult.innerHTML = `<div style="color:#ff6b6b;">❌ НЕДОСТАТОЧНО СРЕДСТВ! Нужно ${betAmount} монет.</div>`;
+                    return;
+                }
+                
+                playerBet = betAmount;
+                coins -= playerBet;
+                playerStats.totalWagered += playerBet;
+                coinsDisplay.textContent = coins;
+                updateUI();
+                
+                crashGameActive = true;
+                crashBetBtn.disabled = true;
+                crashCashoutBtn.style.display = 'block';
+                currentMultiplier = 1.00;
+                
+                // Более реалистичный алгоритм краша
+                crashPoint = Math.max(1.1, Math.min(10, -Math.log(Math.random()) * 2));
+                
+                crashResult.innerHTML = `📈 График растет...`;
+                
+                crashInterval = setInterval(function() {
+                    currentMultiplier += 0.01;
+                    crashMultiplier.textContent = currentMultiplier.toFixed(2) + 'x';
+                    crashLine.style.transform = `scaleX(${Math.min(currentMultiplier / 10, 1)})`;
+                    
+                    if (currentMultiplier >= crashPoint) {
+                        endCrashGame(false);
+                    }
+                }, 100);
+            });
+            
+            crashCashoutBtn.addEventListener('click', function() {
+                if (!crashGameActive) return;
+                endCrashGame(true);
+            });
+            
+            function endCrashGame(manualCashout) {
+                clearInterval(crashInterval);
+                crashGameActive = false;
+                crashBetBtn.disabled = false;
+                crashCashoutBtn.style.display = 'none';
+                
+                let message = '';
+                
+                if (manualCashout) {
+                    const winAmount = Math.floor(playerBet * currentMultiplier);
+                    coins += winAmount;
+                    playerStats.totalWins += winAmount;
+                    message = `🎉 УСПЕХ! Вы забрали ${winAmount} монет (${currentMultiplier.toFixed(2)}x)`;
+                    showNotification(`💰 +${winAmount} монет!`);
+                } else {
+                    message = `💥 КРАШ! Мультипликатор упал на ${crashPoint.toFixed(2)}x`;
+                    playerStats.totalLosses += playerBet;
+                }
+                
+                playerStats.gamesPlayed++;
+                coinsDisplay.textContent = coins;
+                
+                // Сохраняем в историю
+                addGameHistory('crash', message);
+                
+                saveToCloud();
+                updateUI();
+                crashLine.style.transform = 'scaleX(0)';
+                crashMultiplier.textContent = '1.00x';
+                
+                crashResult.innerHTML = message;
+            }
+        }
+
+        // ========== УЛУЧШЕННАЯ АДМИН ПАНЕЛЬ ==========
+        function showAdminPanel() {
+            if (!isAdmin()) {
+                showNotification('❌ Доступ запрещен!', 'error');
+                return;
+            }
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('adminOverlay').style.display = 'block';
+        }
+
+        function hideAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminOverlay').style.display = 'none';
+        }
+
+        function adminAddCoins() {
+            if (!isAdmin()) {
+                showNotification('❌ Доступ запрещен!', 'error');
+                return;
+            }
+            
+            const userId = document.getElementById('adminUserId').value.trim();
+            const amount = parseInt(document.getElementById('adminCoinsAmount').value);
+            
+            if (!userId) {
+                showNotification('❌ Введите ID пользователя!', 'error');
+                return;
+            }
+            
+            if (isNaN(amount) || amount <= 0 || amount > 100000) {
+                showNotification('❌ Введите корректное количество монет!', 'error');
+                return;
+            }
+            
+            if (userId === userDisplayId) {
+                coins += amount;
+                updateUI();
+                saveToCloud();
+                showNotification(`✅ Вам выдано ${amount} монет!`);
+                hideAdminPanel();
+                
+                // Очищаем поля
+                document.getElementById('adminUserId').value = '';
+                document.getElementById('adminCoinsAmount').value = '1000';
+            } else {
+                showNotification('❌ Пользователь не найден!', 'error');
+            }
+        }
+
+        function isAdmin() {
+            return userDisplayId === ADMIN_USER_ID;
+        }
+
+        function checkAndShowAdminPanel() {
+            const adminAccess = document.getElementById('adminAccess');
+            if (adminAccess) {
+                adminAccess.style.display = isAdmin() ? 'block' : 'none';
+            }
+        }
+
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загружаем Google Auth
+            const savedUser = localStorage.getItem('googleUser');
+            if (savedUser) {
+                try {
+                    googleUser = JSON.parse(savedUser);
+                    isGoogleAuthenticated = true;
+                    showGoogleUserInfo();
+                    loadFromCloud();
+                } catch (e) {
+                    console.error('Error loading user:', e);
+                }
+            }
+
+            // Генерируем уникальный ID для гостя
+            if (!userDisplayId || userDisplayId === 'Гость_001') {
+                userDisplayId = 'Гость_' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            }
+
+            initializeNavigation();
+            initializeSlotsGame();
+            initializeCrashGame();
+            updateUserDisplay();
+            updateUI();
+            loadFromLocalStorage();
+
+            window.handleGoogleSignIn = handleGoogleSignIn;
+            
+            console.log('🎰 ROMANO CASINO запущен!');
+            console.log('🔧 Безопасная версия с улучшениями');
+            console.log('👤 Ваш ID:', userDisplayId);
+            if (isAdmin()) {
+                console.log('🔑 Админ-доступ активен');
+            }
+        });
+    </script>
+</body>
+</html>
