@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROMANO CASINO | Молодежный клуб</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <style>
+        /* Стили остаются без изменений */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-green: #00ff00;
+            --neon-purple: #bf00ff;
+            --neon-orange: #ff6b00;
+            --neon-yellow: #ffff00;
+            --dark-bg: #0f0f1a;
+            --card-bg: #1a1a2e;
+            --text-color: #ffffff;
+        }
+
+        :root[data-theme="light"] {
+            --dark-bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --neon-pink: #e600e6;
+            --neon-blue: #00cccc;
+            --neon-green: #00cc00;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .main-nav {
+            background: var(--card-bg);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 20px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-bottom: 3px solid var(--neon-blue);
+        }
+
+        .game-content {
+            display: none;
+        }
+
+        .game-content.active {
+            display: block;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-info {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .coins-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        /* Эффекты для выигрышей */
+        .win-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--neon-yellow);
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .jackpot-animation {
+            animation: jackpotGlow 0.5s ease-in-out infinite;
+            border-color: var(--neon-yellow) !important;
+        }
+
+        @keyframes jackpotGlow {
+            0%, 100% { 
+                box-shadow: 0 0 20px var(--neon-yellow),
+                           0 0 40px var(--neon-yellow),
+                           0 0 60px var(--neon-yellow);
+            }
+            50% { 
+                box-shadow: 0 0 30px var(--neon-yellow),
+                           0 0 60px var(--neon-yellow),
+                           0 0 90px var(--neon-yellow);
+            }
+        }
+
+        .big-win-animation {
+            animation: bigWinPulse 0.3s ease-in-out 3;
+        }
+
+        @keyframes bigWinPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .coin-shower {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .coin {
+            position: absolute;
+            font-size: 2rem;
+            animation: coinFall linear forwards;
+        }
+
+        @keyframes coinFall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--neon-green), #00cc00);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 10000;
+            font-weight: bold;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, #ff6b6b, #ff0000);
+        }
+
+        .notification.warning {
+            background: linear-gradient(45deg, var(--neon-orange), #ff9900);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Остальные стили */
+        .auth-section, .bet-controls, .casino-game, .crash-game, .bonus-section, 
+        .daily-bonus-section, .level-system-section, .profile-stats {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            background: var(--neon-blue);
+            color: #000;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid var(--neon-blue);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .auth-btn {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+
+        .bet-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .bet-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            border: 1px solid var(--neon-blue);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .bet-btn.active {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .current-bet {
+            text-align: center;
+            margin-top: 10px;
+            color: var(--neon-blue);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .game-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--neon-pink);
+            font-size: 1.8rem;
+        }
+
+        .slots-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            position: relative;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 2px solid var(--neon-pink);
+            min-height: 300px;
+            align-items: center;
+        }
+
+        .slot-column {
+            width: 100px;
+            height: 270px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slot-strip {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 2s cubic-bezier(0.2, 0.8, 0.3, 1);
+        }
+
+        .slot-item {
+            width: 80px;
+            height: 80px;
+            margin: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .spin-btn {
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 1.1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 15px auto;
+            display: block;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .crash-graph {
+            background: rgba(0, 0, 0, 0.3);
+            height: 200px;
+            border-radius: 10px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--neon-blue);
+        }
+
+        .crash-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--neon-green);
+            transform-origin: left center;
+            transform: scaleX(0);
+            transition: transform 0.1s linear;
+        }
+
+        .crash-multiplier {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        .crash-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .crash-bet-input {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .crash-bet-btn, .crash-cashout-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .crash-bet-btn {
+            background: linear-gradient(45deg, var(--neon-green), #00cc00);
+            color: white;
+        }
+
+        .crash-cashout-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff0000);
+            color: white;
+            display: none;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-color);
+        }
+
+        .bonus-title {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2.2rem;
+            background: linear-gradient(45deg, var(--neon-yellow), var(--neon-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bonus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .bonus-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid var(--neon-yellow);
+            text-align: center;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .bonus-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .bonus-card-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--neon-yellow);
+        }
+
+        .bonus-reward {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--neon-green);
+            margin: 15px 0;
+        }
+
+        .bonus-btn {
+            background: linear-gradient(45deg, var(--neon-yellow), var(--neon-orange));
+            color: black;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .bonus-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .daily-bonus-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--neon-blue);
+            font-size: 1.8rem;
+        }
+
+        .bonus-calendar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .bonus-day {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #444;
+            transition: all 0.3s ease;
+            position: relative;
+            color: var(--text-color);
+        }
+
+        .bonus-day.active {
+            background: var(--neon-green);
+            color: black;
+            border-color: var(--neon-green);
+            transform: scale(1.1);
+        }
+
+        .bonus-day.claimed {
+            background: var(--neon-blue);
+            color: black;
+            border-color: var(--neon-blue);
+        }
+
+        .bonus-day.future {
+            opacity: 0.5;
+        }
+
+        .day-reward {
+            font-size: 0.8rem;
+            margin-top: 2px;
+        }
+
+        .level-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--neon-purple);
+            font-size: 1.8rem;
+        }
+
+        .level-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .level-badge {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .level-info {
+            flex: 1;
+            padding: 0 20px;
+        }
+
+        .level-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--neon-purple);
+            margin-bottom: 5px;
+        }
+
+        .level-progress {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .level-progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .level-exp {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+
+        .stat-card i {
+            font-size: 2rem;
+            color: var(--neon-blue);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--neon-green);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--neon-blue);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .user-profile-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            color: var(--text-color);
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-blue);
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        .logout-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff0000);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .bonus-grid, .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .level-display {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .slot-column {
+                width: 80px;
+                height: 240px;
+            }
+            .slot-item {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+            .nav-tab {
+                min-width: 100px;
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+            .crash-controls {
+                flex-direction: column;
+            }
+            .crash-bet-input, .crash-bet-btn, .crash-cashout-btn {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <div class="container">
+        <nav class="main-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="slots"><i class="fas fa-sliders-h"></i>СЛОТЫ</button>
+                <button class="nav-tab" data-tab="crash"><i class="fas fa-chart-line"></i>КРАШ</button>
+                <button class="nav-tab" data-tab="bonuses"><i class="fas fa-gift"></i>БОНУСЫ</button>
+                <button class="nav-tab" data-tab="profile"><i class="fas fa-user"></i>ПРОФИЛЬ</button>
+            </div>
+        </nav>
+
+        <header>
+            <div class="logo">ROMANO CASINO</div>
+            <div class="user-info">
+                <div>ID: <strong id="userId">Гость_001</strong></div>
+                <div class="coins-display"><i class="fas fa-coins"></i> <span id="coinsBalance">500</span> монет</div>
+            </div>
+        </header>
+
+        <div id="slots-content" class="game-content active">
+            <div class="bet-controls">
+                <h3><i class="fas fa-coins"></i> ВЫБЕРИ СТАВКУ</h3>
+                <div class="bet-buttons">
+                    <button class="bet-btn active" data-bet="10">10 🪙</button>
+                    <button class="bet-btn" data-bet="25">25 🪙</button>
+                    <button class="bet-btn" data-bet="50">50 🪙</button>
+                    <button class="bet-btn" data-bet="100">100 🪙</button>
+                </div>
+                <div class="current-bet">Текущая ставка: <span id="currentBet">10</span> монет</div>
+            </div>
+
+            <div class="casino-game">
+                <h2 class="game-title">СУПЕР СЛОТЫ</h2>
+                <div class="slots-container">
+                    <div class="slot-column"><div class="slot-strip" id="slotStrip1"></div></div>
+                    <div class="slot-column"><div class="slot-strip" id="slotStrip2"></div></div>
+                    <div class="slot-column"><div class="slot-strip" id="slotStrip3"></div></div>
+                </div>
+                <button id="spinBtn" class="spin-btn"><i class="fas fa-play"></i> КРУТИТЬ ЗА <span id="spinCost">10</span> МОНЕТ</button>
+                <div id="slotsResult" class="result">Сделайте ставку и нажмите "Крутить"!</div>
+            </div>
+        </div>
+
+        <div id="crash-content" class="game-content">
+            <div class="bet-controls">
+                <h3><i class="fas fa-coins"></i> ВЫБЕРИ СТАВКУ</h3>
+                <div class="bet-buttons">
+                    <button class="bet-btn active" data-bet="10">10 🪙</button>
+                    <button class="bet-btn" data-bet="25">25 🪙</button>
+                    <button class="bet-btn" data-bet="50">50 🪙</button>
+                    <button class="bet-btn" data-bet="100">100 🪙</button>
+                </div>
+                <div class="current-bet">Текущая ставка: <span id="crashCurrentBet">10</span> монет</div>
+            </div>
+
+            <div class="crash-game">
+                <h2 class="game-title">КРАШ ИГРА</h2>
+                <div class="crash-graph">
+                    <div class="crash-line"></div>
+                    <div class="crash-multiplier">1.00x</div>
+                </div>
+                <div class="crash-controls">
+                    <input type="number" class="crash-bet-input" id="crashBetAmount" value="10" min="10" max="100000">
+                    <button class="crash-bet-btn" id="crashBetBtn"><i class="fas fa-play"></i> СДЕЛАТЬ СТАВКУ</button>
+                    <button class="crash-cashout-btn" id="crashCashoutBtn"><i class="fas fa-hand-holding-usd"></i> ЗАБРАТЬ</button>
+                </div>
+                <div id="crashResult" class="result">Сделайте ставку чтобы начать игру!</div>
+            </div>
+        </div>
+
+        <div id="bonuses-content" class="game-content">
+            <div class="daily-bonus-section">
+                <h2 class="daily-bonus-title"><i class="fas fa-calendar-day"></i> ЕЖЕДНЕВНЫЕ БОНУСЫ</h2>
+                <div class="bonus-calendar" id="bonusCalendar"></div>
+                <button class="bonus-btn" id="claimDailyBonusBtn"><i class="fas fa-gift"></i> ПОЛУЧИТЬ БОНУС</button>
+            </div>
+
+            <div class="bonus-section">
+                <h2 class="bonus-title"><i class="fas fa-star"></i> СПЕЦИАЛЬНЫЕ БОНУСЫ</h2>
+                <div class="bonus-grid">
+                    <div class="bonus-card">
+                        <div class="bonus-icon">🎮</div>
+                        <div class="bonus-card-title">ПЕРВАЯ ИГРА</div>
+                        <div class="bonus-reward">+100 🪙</div>
+                        <button class="bonus-btn" id="firstGameBonusBtn">ПОЛУЧИТЬ</button>
+                    </div>
+                    <div class="bonus-card">
+                        <div class="bonus-icon">🎰</div>
+                        <div class="bonus-card-title">10 СПИНОВ</div>
+                        <div class="bonus-reward">+200 🪙</div>
+                        <button class="bonus-btn" id="tenSpinsBonusBtn">ПОЛУЧИТЬ</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="level-system-section">
+                <h2 class="level-title"><i class="fas fa-trophy"></i> СИСТЕМА УРОВНЕЙ</h2>
+                <div class="level-display">
+                    <div class="level-badge" id="levelBadge">1</div>
+                    <div class="level-info">
+                        <div class="level-text">Уровень <span id="currentLevel">1</span></div>
+                        <div class="level-progress">
+                            <div class="level-progress-fill" id="levelProgressFill" style="width: 0%"></div>
+                        </div>
+                        <div class="level-exp">
+                            <span id="currentExp">0</span> / <span id="nextLevelExp">100</span> XP
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="profile-content" class="game-content">
+            <div class="auth-section">
+                <h3><i class="fas fa-cloud"></i> ОБЛАЧНОЕ СОХРАНЕНИЕ</h3>
+                <div id="guestAuth">
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" data-form="login">ВОЙТИ</button>
+                        <button class="auth-tab" data-form="register">РЕГИСТРАЦИЯ</button>
+                    </div>
+                    <div id="loginForm" class="auth-form active">
+                        <input type="email" id="loginEmail" placeholder="Email" class="auth-input">
+                        <input type="password" id="loginPassword" placeholder="Пароль" class="auth-input">
+                        <button class="auth-btn" id="loginBtn">ВОЙТИ</button>
+                    </div>
+                    <div id="registerForm" class="auth-form">
+                        <input type="email" id="registerEmail" placeholder="Email" class="auth-input">
+                        <input type="password" id="registerPassword" placeholder="Пароль" class="auth-input">
+                        <input type="text" id="registerName" placeholder="Имя" class="auth-input">
+                        <button class="auth-btn" id="registerBtn">СОЗДАТЬ АККАУНТ</button>
+                    </div>
+                </div>
+                <div id="userAuth" style="display: none;">
+                    <div class="user-profile-info">
+                        <div class="user-avatar"><i class="fas fa-user"></i></div>
+                        <div class="user-details">
+                            <div class="user-name" id="authUserName">Игрок</div>
+                            <div class="user-email" id="authUserEmail">email@example.com</div>
+                            <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+                        </div>
+                    </div>
+                    <div class="sync-status" id="syncStatus"></div>
+                </div>
+            </div>
+
+            <div class="profile-stats">
+                <h2>ВАША СТАТИСТИКА</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-coins"></i>
+                        <div class="stat-value" id="profileBalance">500</div>
+                        <div class="stat-label">БАЛАНС</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <div class="stat-value" id="totalWins">0</div>
+                        <div class="stat-label">ВЫИГРЫШИ</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-bar"></i>
+                        <div class="stat-value" id="totalSpins">0</div>
+                        <div class="stat-label">СПИНЫ</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-star"></i>
+                        <div class="stat-value" id="playerLevel">1</div>
+                        <div class="stat-label">УРОВЕНЬ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ИСПРАВЛЕННАЯ КОНФИГУРАЦИЯ FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyD61sJ9UhNn914YdzXX2qd7Uj3nekP5cik",
+            authDomain: "romano-casino.firebaseapp.com",
+            projectId: "romano-casino",
+            storageBucket: "romano-casino.appspot.com",
+            messagingSenderId: "780529022979",
+            appId: "1:780529022979:web:3a21f4af921e5b75f1b636"
+        };
+
+        // Инициализация Firebase с проверкой
+        let auth, db;
+        try {
+            // Проверяем, инициализирован ли уже Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                console.log('Firebase успешно инициализирован');
+            } else {
+                firebase.app(); // используем существующее приложение
+            }
+            auth = firebase.auth();
+            db = firebase.firestore();
+        } catch (error) {
+            console.error('Ошибка инициализации Firebase:', error);
+        }
+
+        // БАЛАНСИРОВКА ИГРЫ - ИСПРАВЛЕННЫЕ НАСТРОЙКИ
+        const GAME_CONFIG = {
+            SLOTS: {
+                // Уменьшенные шансы на выигрыш
+                SYMBOL_PROBABILITIES: [0.4, 0.25, 0.15, 0.1, 0.06, 0.04], // Более редкие выигрышные символы
+                PAYOUTS: {
+                    THREE_SAME: 2.5,    // Уменьшено с 3.0
+                    TWO_SAME: 1.2       // Уменьшено с 1.5
+                }
+            },
+            CRASH: {
+                MIN_MULTIPLIER: 1.0,
+                MAX_MULTIPLIER: 3.0,    // Уменьшено с 5.0
+                BASE_INCREMENT: 0.02,   // Замедлена скорость роста
+                CRASH_PROBABILITY: 0.15, // Увеличена вероятность краша
+                INCREMENT_DECAY: 0.995   // Замедление роста со временем
+            },
+            BALANCE: {
+                STARTING_COINS: 500,    // Уменьшено с 1000
+                MIN_BET: 10,
+                MAX_BET: 1000
+            },
+            BONUSES: {
+                DAILY_BASE: 50,         // Уменьшено с 100
+                FIRST_GAME: 100,        // Уменьшено с 500
+                TEN_SPINS: 200          // Уменьшено с 1000
+            }
+        };
+
+        class SoundSystem {
+            constructor() {
+                this.sounds = new Map();
+                this.enabled = true;
+                this.audioContext = null;
+                this.init();
+            }
+
+            async init() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.loadDefaultSounds();
+                } catch (error) {
+                    console.warn('Audio not supported');
+                }
+            }
+
+            loadDefaultSounds() {
+                const soundConfigs = {
+                    spin: { type: 'sine', frequency: 200, duration: 0.5 },
+                    win: { type: 'sine', frequency: 800, duration: 0.3 },
+                    bigWin: { type: 'sine', frequency: 1200, duration: 0.8 },
+                    jackpot: { type: 'sine', frequency: 1500, duration: 1.0 }
+                };
+                for (const [name, config] of Object.entries(soundConfigs)) {
+                    this.sounds.set(name, config);
+                }
+            }
+
+            play(name, volume = 0.7) {
+                if (!this.enabled || !this.audioContext || !this.sounds.has(name)) return;
+                
+                try {
+                    const config = this.sounds.get(name);
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.type = config.type;
+                    oscillator.frequency.setValueAtTime(config.frequency, this.audioContext.currentTime);
+                    
+                    gainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + config.duration);
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    oscillator.start();
+                    oscillator.stop(this.audioContext.currentTime + config.duration);
+                } catch (error) {
+                    console.warn('Sound play failed:', error);
+                }
+            }
+
+            toggle() {
+                this.enabled = !this.enabled;
+                return this.enabled;
+            }
+        }
+
+        class EffectSystem {
+            static createConfetti(count = 50) {
+                const effect = document.createElement('div');
+                effect.className = 'win-effect';
+                
+                const fragment = document.createDocumentFragment();
+                for (let i = 0; i < count; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = this.getRandomColor();
+                    confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    confetti.style.animationDelay = (Math.random() * 1) + 's';
+                    fragment.appendChild(confetti);
+                }
+                
+                effect.appendChild(fragment);
+                document.body.appendChild(effect);
+                setTimeout(() => {
+                    effect.remove();
+                }, 5000);
+            }
+
+            static createCoinShower(count = 20) {
+                const shower = document.createElement('div');
+                shower.className = 'coin-shower';
+                
+                const fragment = document.createDocumentFragment();
+                for (let i = 0; i < count; i++) {
+                    const coin = document.createElement('div');
+                    coin.className = 'coin';
+                    coin.textContent = '🪙';
+                    coin.style.left = Math.random() * 100 + 'vw';
+                    coin.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                    coin.style.animationDelay = (Math.random() * 0.5) + 's';
+                    coin.style.fontSize = (Math.random() * 1 + 1.5) + 'rem';
+                    fragment.appendChild(coin);
+                }
+                
+                shower.appendChild(fragment);
+                document.body.appendChild(shower);
+                setTimeout(() => {
+                    shower.remove();
+                }, 3000);
+            }
+
+            static getRandomColor() {
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff9900', '#9900ff'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            static animateElement(element, animationClass) {
+                if (!element) return;
+                
+                element.classList.add(animationClass);
+                setTimeout(() => {
+                    element.classList.remove(animationClass);
+                }, 2000);
+            }
+        }
+
+        class GameStateManager {
+            constructor() {
+                this.state = {
+                    coins: GAME_CONFIG.BALANCE.STARTING_COINS,
+                    totalSpins: 0,
+                    totalWins: 0,
+                    firstGameBonusClaimed: false,
+                    tenSpinsBonusClaimed: false,
+                    level: 1,
+                    experience: 0,
+                    lastDailyBonusDate: null
+                };
+                this.observers = [];
+            }
+
+            subscribe(observer) {
+                this.observers.push(observer);
+                return () => {
+                    this.observers = this.observers.filter(obs => obs !== observer);
+                };
+            }
+
+            notify(change) {
+                this.observers.forEach(observer => {
+                    if (typeof observer === 'function') {
+                        observer(this.state, change);
+                    }
+                });
+            }
+
+            updateCoins(amount) {
+                const newCoins = this.state.coins + amount;
+                if (newCoins < 0) throw new Error('Недостаточно монет');
+                
+                this.state.coins = newCoins;
+                this.notify({ type: 'COINS_UPDATE', amount, newCoins });
+                return newCoins;
+            }
+
+            incrementSpins() {
+                this.state.totalSpins++;
+                this.notify({ type: 'SPINS_INCREMENT', totalSpins: this.state.totalSpins });
+            }
+
+            addWin(amount) {
+                this.state.totalWins += amount;
+                this.notify({ type: 'WIN_ADDED', amount, totalWins: this.state.totalWins });
+            }
+
+            addExperience(amount) {
+                this.state.experience += amount;
+                const expForNextLevel = this.state.level * 100;
+                let leveledUp = false;
+
+                if (this.state.experience >= expForNextLevel) {
+                    this.state.level++;
+                    this.state.experience -= expForNextLevel;
+                    leveledUp = true;
+                    this.notify({ type: 'LEVEL_UP', newLevel: this.state.level });
+                }
+
+                this.notify({ 
+                    type: 'EXPERIENCE_ADDED', 
+                    amount, 
+                    experience: this.state.experience,
+                    leveledUp 
+                });
+                return leveledUp;
+            }
+
+            getExpForNextLevel() {
+                return this.state.level * 100;
+            }
+
+            canClaimDailyBonus() {
+                if (!this.state.lastDailyBonusDate) return true;
+                const today = new Date().toDateString();
+                return this.state.lastDailyBonusDate !== today;
+            }
+
+            claimDailyBonus() {
+                const today = new Date().toDateString();
+                this.state.lastDailyBonusDate = today;
+                const reward = GAME_CONFIG.BONUSES.DAILY_BASE + (this.state.level * 10); // Уменьшено
+                this.updateCoins(reward);
+                return reward;
+            }
+
+            toJSON() {
+                return { ...this.state };
+            }
+
+            fromJSON(data) {
+                if (data && typeof data === 'object') {
+                    Object.assign(this.state, data);
+                    this.notify({ type: 'STATE_LOADED', state: this.state });
+                }
+            }
+        }
+
+        // ИСПРАВЛЕННЫЕ СЛОТЫ С БАЛАНСИРОВКОЙ
+        class SlotsGame {
+            constructor(soundSystem, effectSystem) {
+                if (!soundSystem || !effectSystem) {
+                    throw new Error('SlotsGame requires sound and effect systems');
+                }
+                
+                this.soundSystem = soundSystem;
+                this.effectSystem = effectSystem;
+                this.symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎'];
+                this.isSpinning = false;
+                this.slotItemHeight = 88;
+            }
+
+            getRandomSymbol() {
+                const rand = Math.random();
+                let cumulative = 0;
+                
+                for (let i = 0; i < GAME_CONFIG.SLOTS.SYMBOL_PROBABILITIES.length; i++) {
+                    cumulative += GAME_CONFIG.SLOTS.SYMBOL_PROBABILITIES[i];
+                    if (rand <= cumulative) {
+                        return this.symbols[i];
+                    }
+                }
+                return this.symbols[0];
+            }
+
+            async spin(betAmount, stateManager) {
+                if (this.isSpinning) {
+                    throw new Error('Уже вращается');
+                }
+                if (stateManager.state.coins < betAmount) {
+                    throw new Error('Недостаточно монет');
+                }
+
+                this.isSpinning = true;
+                this.soundSystem.play('spin');
+
+                // Списываем ставку
+                stateManager.updateCoins(-betAmount);
+                stateManager.incrementSpins();
+
+                const results = [
+                    this.getRandomSymbol(),
+                    this.getRandomSymbol(),
+                    this.getRandomSymbol()
+                ];
+
+                await this.animateSlotSpin(results);
+                
+                const winResult = this.calculateWin(results, betAmount);
+                this.processWin(winResult, stateManager);
+                
+                this.isSpinning = false;
+                return winResult;
+            }
+
+            calculateWin(results, betAmount) {
+                let winAmount = 0;
+                let winType = '';
+
+                if (results[0] === results[1] && results[1] === results[2]) {
+                    winAmount = Math.floor(betAmount * GAME_CONFIG.SLOTS.PAYOUTS.THREE_SAME);
+                    winType = 'JACKPOT';
+                } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+                    winAmount = Math.floor(betAmount * GAME_CONFIG.SLOTS.PAYOUTS.TWO_SAME);
+                    winType = 'WIN';
+                }
+
+                return { winAmount, winType, results };
+            }
+
+            processWin(winResult, stateManager) {
+                if (winResult.winAmount > 0) {
+                    stateManager.updateCoins(winResult.winAmount);
+                    stateManager.addWin(winResult.winAmount);
+                    
+                    const expGained = Math.floor(winResult.winAmount / 15);
+                    const leveledUp = stateManager.addExperience(expGained);
+
+                    this.playWinEffects(winResult);
+                } else {
+                    stateManager.addExperience(1);
+                }
+            }
+
+            playWinEffects(winResult) {
+                const slotsContainer = document.querySelector('.slots-container');
+                if (!slotsContainer) return;
+
+                if (winResult.winType === 'JACKPOT') {
+                    this.soundSystem.play('jackpot');
+                    EffectSystem.createConfetti(100);
+                    EffectSystem.createCoinShower(30);
+                    EffectSystem.animateElement(slotsContainer, 'jackpot-animation');
+                } else if (winResult.winAmount >= 100) {
+                    this.soundSystem.play('bigWin');
+                    EffectSystem.createConfetti(50);
+                    EffectSystem.createCoinShower(15);
+                    EffectSystem.animateElement(slotsContainer, 'big-win-animation');
+                } else {
+                    this.soundSystem.play('win');
+                    EffectSystem.createConfetti(20);
+                }
+            }
+
+            async animateSlotSpin(results) {
+                const strips = [
+                    document.getElementById('slotStrip1'),
+                    document.getElementById('slotStrip2'),
+                    document.getElementById('slotStrip3')
+                ].filter(strip => strip !== null);
+
+                if (strips.length !== 3) {
+                    throw new Error('Slot strips not found');
+                }
+
+                const animations = strips.map((strip, index) => {
+                    return new Promise((resolve) => {
+                        this.animateSingleStrip(strip, results[index], resolve, index);
+                    });
+                });
+
+                await Promise.all(animations);
+            }
+
+            animateSingleStrip(strip, resultSymbol, callback, stripIndex) {
+                const duration = 2000 + (stripIndex * 300);
+                const startTime = Date.now();
+                const targetPosition = -5 * this.slotItemHeight;
+
+                const animate = () => {
+                    const currentTime = Date.now();
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    const currentPosition = targetPosition * easeOut;
+                    
+                    strip.style.transform = `translateY(${currentPosition}px)`;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        this.setFinalSymbols(strip, resultSymbol);
+                        strip.style.transform = 'translateY(0)';
+                        callback();
+                    }
+                };
+                
+                animate();
+            }
+
+            setFinalSymbols(strip, resultSymbol) {
+                const fragment = document.createDocumentFragment();
+                for (let i = 0; i < 15; i++) {
+                    const symbol = (i === 7) ? resultSymbol : this.getRandomSymbol();
+                    const slotItem = document.createElement('div');
+                    slotItem.className = 'slot-item';
+                    slotItem.textContent = symbol;
+                    fragment.appendChild(slotItem);
+                }
+                strip.innerHTML = '';
+                strip.appendChild(fragment);
+            }
+
+            initializeSlots() {
+                ['slotStrip1', 'slotStrip2', 'slotStrip3'].forEach(id => {
+                    const strip = document.getElementById(id);
+                    if (strip) {
+                        strip.innerHTML = '';
+                        for (let i = 0; i < 15; i++) {
+                            const symbol = this.getRandomSymbol();
+                            const slotItem = document.createElement('div');
+                            slotItem.className = 'slot-item';
+                            slotItem.textContent = symbol;
+                            strip.appendChild(slotItem);
+                        }
+                    }
+                });
+            }
+        }
+
+        // ИСПРАВЛЕННАЯ КРАШ ИГРА С ЗАМЕДЛЕННЫМ РОСТОМ
+        class CrashGame {
+            constructor(soundSystem, effectSystem) {
+                if (!soundSystem || !effectSystem) {
+                    throw new Error('CrashGame requires sound and effect systems');
+                }
+                
+                this.soundSystem = soundSystem;
+                this.effectSystem = effectSystem;
+                this.isActive = false;
+                this.intervalId = null;
+                this.currentMultiplier = 1.0;
+                this.crashPoint = 1.0;
+                this.currentBet = 0;
+                this.currentIncrement = GAME_CONFIG.CRASH.BASE_INCREMENT;
+            }
+
+            start(betAmount, stateManager) {
+                if (this.isActive) {
+                    throw new Error('Игра уже активна');
+                }
+                if (stateManager.state.coins < betAmount) {
+                    throw new Error('Недостаточно монет');
+                }
+
+                this.isActive = true;
+                this.currentMultiplier = 1.0;
+                this.currentBet = betAmount;
+                this.currentIncrement = GAME_CONFIG.CRASH.BASE_INCREMENT;
+                this.crashPoint = this.generateCrashPoint();
+                
+                stateManager.updateCoins(-betAmount);
+                stateManager.incrementSpins();
+
+                this.startMultiplierAnimation();
+                return { crashPoint: this.crashPoint };
+            }
+
+            generateCrashPoint() {
+                // Более сбалансированный алгоритм краша
+                const base = 1.0;
+                const randomFactor = Math.random() * (GAME_CONFIG.CRASH.MAX_MULTIPLIER - 1.0);
+                const crashPoint = base + randomFactor;
+                
+                // Дополнительная проверка на ранний краш
+                if (Math.random() < GAME_CONFIG.CRASH.CRASH_PROBABILITY) {
+                    return Math.min(crashPoint, 1.5 + Math.random() * 0.5);
+                }
+                
+                return crashPoint;
+            }
+
+            startMultiplierAnimation() {
+                this.updateUI();
+                
+                this.intervalId = setInterval(() => {
+                    if (!this.isActive) {
+                        this.stopGame();
+                        return;
+                    }
+                    
+                    // Замедление роста со временем
+                    this.currentIncrement *= GAME_CONFIG.CRASH.INCREMENT_DECAY;
+                    this.currentMultiplier += this.currentIncrement;
+                    this.updateUI();
+                    
+                    // Проверка на случайный краш
+                    const crashChance = GAME_CONFIG.CRASH.CRASH_PROBABILITY * 
+                                      (this.currentMultiplier / GAME_CONFIG.CRASH.MAX_MULTIPLIER);
+                    
+                    if (Math.random() < crashChance || this.currentMultiplier >= this.crashPoint) {
+                        this.crash();
+                    }
+                }, 150); // Увеличено время между обновлениями
+            }
+
+            cashout(stateManager) {
+                if (!this.isActive) {
+                    throw new Error('Игра не активна');
+                }
+
+                this.stopGame();
+                const winAmount = Math.floor(this.currentBet * this.currentMultiplier);
+                
+                stateManager.updateCoins(winAmount);
+                stateManager.addWin(winAmount);
+                stateManager.addExperience(Math.floor(winAmount / 20));
+
+                this.playCashoutEffects(winAmount);
+                return { winAmount, multiplier: this.currentMultiplier, type: 'CASHOUT' };
+            }
+
+            crash() {
+                this.stopGame();
+                return { type: 'CRASH', multiplier: this.currentMultiplier };
+            }
+
+            stopGame() {
+                this.isActive = false;
+                if (this.intervalId) {
+                    clearInterval(this.intervalId);
+                    this.intervalId = null;
+                }
+            }
+
+            playCashoutEffects(winAmount) {
+                if (winAmount >= this.currentBet * 2) {
+                    this.soundSystem.play('bigWin');
+                    EffectSystem.createConfetti(30);
+                } else {
+                    this.soundSystem.play('win');
+                }
+            }
+
+            updateUI() {
+                const multiplierElement = document.querySelector('.crash-multiplier');
+                const lineElement = document.querySelector('.crash-line');
+                
+                if (multiplierElement) {
+                    multiplierElement.textContent = this.currentMultiplier.toFixed(2) + 'x';
+                }
+                if (lineElement) {
+                    lineElement.style.transform = `scaleX(${Math.min(this.currentMultiplier / GAME_CONFIG.CRASH.MAX_MULTIPLIER, 1)})`;
+                }
+            }
+
+            cleanup() {
+                this.stopGame();
+            }
+        }
+
+        class AuthSystem {
+            constructor() {
+                this.userId = null;
+                this.userEmail = null;
+                this.userName = null;
+            }
+
+            async register(email, password, name) {
+                try {
+                    if (!auth) {
+                        throw new Error('Сервис временно недоступен. Работаем в оффлайн режиме.');
+                    }
+
+                    console.log('Начинаем регистрацию для:', email);
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    console.log('Пользователь создан:', userCredential.user);
+                    
+                    await userCredential.user.updateProfile({ displayName: name });
+                    console.log('Профиль обновлен');
+                    
+                    if (db) {
+                        await db.collection('users').doc(userCredential.user.uid).set({
+                            email: email,
+                            displayName: name,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        console.log('Данные сохранены в Firestore');
+                    }
+                    
+                    return userCredential.user;
+                } catch (error) {
+                    console.error('Ошибка регистрации:', error);
+                    throw new Error(this.getAuthErrorMessage(error));
+                }
+            }
+
+            async login(email, password) {
+                try {
+                    if (!auth) {
+                        throw new Error('Сервис временно недоступен. Работаем в оффлайн режиме.');
+                    }
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    return userCredential.user;
+                } catch (error) {
+                    throw new Error(this.getAuthErrorMessage(error));
+                }
+            }
+
+            async logout() {
+                if (auth) {
+                    await auth.signOut();
+                }
+            }
+
+            getAuthErrorMessage(error) {
+                const errorMap = {
+                    'auth/email-already-in-use': 'Этот email уже используется',
+                    'auth/invalid-email': 'Неверный формат email',
+                    'auth/weak-password': 'Пароль должен содержать минимум 6 символов',
+                    'auth/user-not-found': 'Пользователь не найден',
+                    'auth/wrong-password': 'Неверный пароль',
+                    'auth/network-request-failed': 'Ошибка сети. Проверьте подключение к интернету',
+                    'auth/too-many-requests': 'Слишком много попыток. Попробуйте позже'
+                };
+                return errorMap[error.code] || `Ошибка: ${error.message}`;
+            }
+
+            async saveGameData(stateManager) {
+                if (!this.userId || !db) {
+                    console.log('Сохранение невозможно: нет пользователя или базы данных');
+                    return false;
+                }
+                
+                try {
+                    const gameData = stateManager.toJSON();
+                    gameData.lastSaved = firebase.firestore.FieldValue.serverTimestamp();
+                    gameData.userId = this.userId;
+                    
+                    await db.collection('userProgress').doc(this.userId).set(gameData, { merge: true });
+                    console.log('Данные успешно сохранены');
+                    return true;
+                } catch (error) {
+                    console.error('Ошибка сохранения:', error);
+                    return false;
+                }
+            }
+
+            async loadGameData() {
+                if (!this.userId || !db) {
+                    console.log('Загрузка невозможна: нет пользователя или базы данных');
+                    return null;
+                }
+                
+                try {
+                    const doc = await db.collection('userProgress').doc(this.userId).get();
+                    if (doc.exists) {
+                        console.log('Данные успешно загружены');
+                        return doc.data();
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки:', error);
+                }
+                return null;
+            }
+        }
+
+        class App {
+            constructor() {
+                this.stateManager = new GameStateManager();
+                this.soundSystem = new SoundSystem();
+                this.effectSystem = EffectSystem;
+                this.authSystem = new AuthSystem();
+                
+                this.slotsGame = new SlotsGame(this.soundSystem, this.effectSystem);
+                this.crashGame = new CrashGame(this.soundSystem, this.effectSystem);
+                
+                this.currentBet = 10;
+                this.isInitialized = false;
+            }
+
+            async init() {
+                if (this.isInitialized) return;
+                
+                try {
+                    this.setupEventListeners();
+                    this.setupStateObserver();
+                    this.slotsGame.initializeSlots();
+                    this.initializeBonusCalendar();
+                    this.setupAuthListener();
+                    this.updateUI();
+                    
+                    this.isInitialized = true;
+                    console.log('✅ Romano Casino инициализирован');
+                } catch (error) {
+                    console.error('❌ Ошибка инициализации:', error);
+                    this.showNotification('Ошибка инициализации приложения', 'error');
+                }
+            }
+
+            setupStateObserver() {
+                this.stateManager.subscribe((state, change) => {
+                    this.updateUI();
+                    
+                    if (change.type === 'LEVEL_UP') {
+                        this.showNotification(`🎯 Уровень UP! Теперь уровень ${change.newLevel}`);
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                // Переключение вкладок
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        const tabName = e.target.dataset.tab;
+                        this.switchTab(tabName);
+                    });
+                });
+
+                // Переключение форм авторизации
+                document.querySelectorAll('.auth-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        const formName = e.target.dataset.form;
+                        this.switchAuthForm(formName);
+                    });
+                });
+
+                // Кнопки ставок
+                document.querySelectorAll('.bet-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.setCurrentBet(parseInt(e.target.dataset.bet));
+                    });
+                });
+
+                // Игровые кнопки
+                const spinBtn = document.getElementById('spinBtn');
+                const crashBetBtn = document.getElementById('crashBetBtn');
+                const crashCashoutBtn = document.getElementById('crashCashoutBtn');
+                
+                if (spinBtn) spinBtn.addEventListener('click', () => this.spinSlots());
+                if (crashBetBtn) crashBetBtn.addEventListener('click', () => this.startCrashGame());
+                if (crashCashoutBtn) crashCashoutBtn.addEventListener('click', () => this.cashoutCrashGame());
+
+                // Бонусные кнопки
+                const claimDailyBonusBtn = document.getElementById('claimDailyBonusBtn');
+                const firstGameBonusBtn = document.getElementById('firstGameBonusBtn');
+                const tenSpinsBonusBtn = document.getElementById('tenSpinsBonusBtn');
+                
+                if (claimDailyBonusBtn) claimDailyBonusBtn.addEventListener('click', () => this.claimDailyBonus());
+                if (firstGameBonusBtn) firstGameBonusBtn.addEventListener('click', () => this.claimFirstGameBonus());
+                if (tenSpinsBonusBtn) tenSpinsBonusBtn.addEventListener('click', () => this.claimTenSpinsBonus());
+
+                // Авторизация
+                const registerBtn = document.getElementById('registerBtn');
+                const loginBtn = document.getElementById('loginBtn');
+                const logoutBtn = document.getElementById('logoutBtn');
+                
+                if (registerBtn) registerBtn.addEventListener('click', () => this.handleRegister());
+                if (loginBtn) loginBtn.addEventListener('click', () => this.handleLogin());
+                if (logoutBtn) logoutBtn.addEventListener('click', () => this.handleLogout());
+
+                // Смена темы
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) themeToggle.addEventListener('click', () => this.toggleTheme());
+            }
+
+            switchTab(tabName) {
+                document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.game-content').forEach(content => content.classList.remove('active'));
+                
+                const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
+                const activeContent = document.getElementById(`${tabName}-content`);
+                
+                if (activeTab) activeTab.classList.add('active');
+                if (activeContent) activeContent.classList.add('active');
+            }
+
+            switchAuthForm(formName) {
+                document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+                
+                const activeTab = document.querySelector(`[data-form="${formName}"]`);
+                const activeForm = document.getElementById(`${formName}Form`);
+                
+                if (activeTab) activeTab.classList.add('active');
+                if (activeForm) activeForm.classList.add('active');
+            }
+
+            setCurrentBet(bet) {
+                this.currentBet = bet;
+                document.querySelectorAll('.bet-btn').forEach(btn => btn.classList.remove('active'));
+                
+                const activeBtn = document.querySelector(`[data-bet="${bet}"]`);
+                if (activeBtn) activeBtn.classList.add('active');
+                
+                const currentBetElement = document.getElementById('currentBet');
+                const spinCostElement = document.getElementById('spinCost');
+                const crashCurrentBetElement = document.getElementById('crashCurrentBet');
+                const crashBetAmountElement = document.getElementById('crashBetAmount');
+                
+                if (currentBetElement) currentBetElement.textContent = bet;
+                if (spinCostElement) spinCostElement.textContent = bet;
+                if (crashCurrentBetElement) crashCurrentBetElement.textContent = bet;
+                if (crashBetAmountElement) crashBetAmountElement.value = bet;
+            }
+
+            async spinSlots() {
+                try {
+                    const spinBtn = document.getElementById('spinBtn');
+                    const resultElement = document.getElementById('slotsResult');
+                    
+                    if (spinBtn) spinBtn.disabled = true;
+                    if (resultElement) resultElement.textContent = '🎰 Крутим...';
+
+                    const result = await this.slotsGame.spin(this.currentBet, this.stateManager);
+                    
+                    if (result.winAmount > 0) {
+                        this.showNotification(`🎉 ${result.winType === 'JACKPOT' ? 'ДЖЕКПОТ!' : 'ВЫИГРЫШ!'} +${result.winAmount} монет!`);
+                        if (resultElement) {
+                            resultElement.innerHTML = `${result.winType === 'JACKPOT' ? '🎊 ДЖЕКПОТ!' : '🎉 ВЫИГРЫШ!'} +${result.winAmount} монет!`;
+                        }
+                    } else {
+                        if (resultElement) {
+                            resultElement.innerHTML = "💸 Попробуй еще раз!";
+                        }
+                    }
+                    
+                    await this.saveGame();
+                } catch (error) {
+                    this.showNotification(`❌ ${error.message}`, 'error');
+                } finally {
+                    const spinBtn = document.getElementById('spinBtn');
+                    if (spinBtn) spinBtn.disabled = false;
+                }
+            }
+
+            async startCrashGame() {
+                try {
+                    const betAmount = parseInt(document.getElementById('crashBetAmount')?.value || this.currentBet);
+                    const betBtn = document.getElementById('crashBetBtn');
+                    const cashoutBtn = document.getElementById('crashCashoutBtn');
+                    const resultElement = document.getElementById('crashResult');
+                    
+                    if (betBtn) betBtn.disabled = true;
+                    if (cashoutBtn) cashoutBtn.style.display = 'block';
+                    if (resultElement) resultElement.textContent = '📈 График растет...';
+
+                    await this.crashGame.start(betAmount, this.stateManager);
+                    
+                } catch (error) {
+                    this.showNotification(`❌ ${error.message}`, 'error');
+                    const betBtn = document.getElementById('crashBetBtn');
+                    if (betBtn) betBtn.disabled = false;
+                }
+            }
+
+            async cashoutCrashGame() {
+                try {
+                    const result = this.crashGame.cashout(this.stateManager);
+                    const resultElement = document.getElementById('crashResult');
+                    
+                    this.showNotification(`💰 Успех! +${result.winAmount} монет`);
+                    if (resultElement) {
+                        resultElement.textContent = `🎉 Вы забрали ${result.winAmount} монет (${result.multiplier.toFixed(2)}x)`;
+                    }
+                    
+                    await this.saveGame();
+                } catch (error) {
+                    this.showNotification(`❌ ${error.message}`, 'error');
+                }
+            }
+
+            claimDailyBonus() {
+                try {
+                    if (!this.stateManager.canClaimDailyBonus()) {
+                        this.showNotification('❌ Вы уже получали бонус сегодня', 'warning');
+                        return;
+                    }
+                    
+                    const bonusAmount = this.stateManager.claimDailyBonus();
+                    this.showNotification(`🎁 Ежедневный бонус: +${bonusAmount} монет!`);
+                    this.initializeBonusCalendar();
+                    this.saveGame();
+                } catch (error) {
+                    this.showNotification(`❌ ${error.message}`, 'error');
+                }
+            }
+
+            claimFirstGameBonus() {
+                try {
+                    if (this.stateManager.state.firstGameBonusClaimed) {
+                        this.showNotification('❌ Бонус уже получен', 'warning');
+                        return;
+                    }
+                    
+                    if (this.stateManager.state.totalSpins === 0) {
+                        this.showNotification('❌ Сначала сыграйте хотя бы одну игру', 'warning');
+                        return;
+                    }
+                    
+                    this.stateManager.state.firstGameBonusClaimed = true;
+                    this.stateManager.updateCoins(GAME_CONFIG.BONUSES.FIRST_GAME);
+                    this.showNotification(`🎮 Бонус за первую игру: +${GAME_CONFIG.BONUSES.FIRST_GAME} монет!`);
+                    this.updateUI();
+                    this.saveGame();
+                } catch (error) {
+                    this.showNotification(`❌ ${error.message}`, 'error');
+                }
+            }
+
+            claimTenSpinsBonus() {
+                try {
+                    if (this.stateManager.state.tenSpinsBonusClaimed) {
+                        this.showNotification('❌ Бонус уже получен', 'warning');
+                        return;
+                    }
+                    
+                    if (this.stateManager.state.totalSpins < 10) {
+                        this.showNotification(`❌ Нужно сделать 10 спинов (сделано: ${this.stateManager.state.totalSpins})`, 'warning');
+                        return;
+                    }
+                    
+                    this.stateManager.state.tenSpinsBonusClaimed = true;
+                    this.stateManager.updateCoins(GAME_CONFIG.BONUSES.TEN_SPINS);
+                    this.showNotification(`🎰 Бонус за 10 спинов: +${GAME_CONFIG.BONUSES.TEN_SPINS} монет!`);
+                    this.updateUI();
+                    this.saveGame();
+                } catch (error) {
+                    this.showNotification(`❌ ${error.message}`, 'error');
+                }
+            }
+
+            setupAuthListener() {
+                if (!auth) {
+                    console.log('Firebase Auth недоступен, работаем в оффлайн режиме');
+                    return;
+                }
+                
+                auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        this.authSystem.userId = user.uid;
+                        this.authSystem.userEmail = user.email;
+                        this.authSystem.userName = user.displayName || 'Игрок';
+                        this.showUserAuthInfo();
+                        
+                        try {
+                            const savedData = await this.authSystem.loadGameData();
+                            if (savedData) {
+                                this.stateManager.fromJSON(savedData);
+                                this.initializeBonusCalendar();
+                            }
+                        } catch (error) {
+                            console.error('Load game data error:', error);
+                        }
+                        
+                        this.showNotification('✅ Вход выполнен');
+                    } else {
+                        this.authSystem.userId = null;
+                        this.authSystem.userEmail = null;
+                        this.authSystem.userName = null;
+                        this.showGuestAuth();
+                    }
+                });
+            }
+
+            async handleRegister() {
+                const email = document.getElementById('registerEmail')?.value;
+                const password = document.getElementById('registerPassword')?.value;
+                const name = document.getElementById('registerName')?.value;
+                
+                if (!email || !password || !name) {
+                    this.showNotification('❌ Заполните все поля', 'error');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    this.showNotification('❌ Пароль должен содержать минимум 6 символов', 'error');
+                    return;
+                }
+
+                const btn = document.getElementById('registerBtn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Регистрация...';
+                }
+
+                try {
+                    await this.authSystem.register(email, password, name);
+                    this.showNotification('✅ Аккаунт создан!');
+                } catch (error) {
+                    this.showNotification(`❌ ${error.message}`, 'error');
+                } finally {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = 'СОЗДАТЬ АККАУНТ';
+                    }
+                }
+            }
+
+            async handleLogin() {
+                const email = document.getElementById('loginEmail')?.value;
+                const password = document.getElementById('loginPassword')?.value;
+                
+                if (!email || !password) {
+                    this.showNotification('❌ Заполните все поля', 'error');
+                    return;
+                }
+
+                const btn = document.getElementById('loginBtn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Вход...';
+                }
+
+                try {
+                    await this.authSystem.login(email, password);
+                } catch (error) {
+                    this.showNotification(`❌ ${error.message}`, 'error');
+                } finally {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = 'ВОЙТИ';
+                    }
+                }
+            }
+
+            async handleLogout() {
+                try {
+                    await this.authSystem.logout();
+                    this.showNotification('🔒 Выход выполнен');
+                } catch (error) {
+                    this.showNotification(`❌ ${error.message}`, 'error');
+                }
+            }
+
+            showUserAuthInfo() {
+                const guestAuth = document.getElementById('guestAuth');
+                const userAuth = document.getElementById('userAuth');
+                const authUserName = document.getElementById('authUserName');
+                const authUserEmail = document.getElementById('authUserEmail');
+                const userId = document.getElementById('userId');
+                
+                if (guestAuth) guestAuth.style.display = 'none';
+                if (userAuth) userAuth.style.display = 'block';
+                if (authUserName) authUserName.textContent = this.authSystem.userName;
+                if (authUserEmail) authUserEmail.textContent = this.authSystem.userEmail;
+                if (userId) userId.textContent = this.authSystem.userName;
+            }
+
+            showGuestAuth() {
+                const guestAuth = document.getElementById('guestAuth');
+                const userAuth = document.getElementById('userAuth');
+                const userId = document.getElementById('userId');
+                
+                if (guestAuth) guestAuth.style.display = 'block';
+                if (userAuth) userAuth.style.display = 'none';
+                if (userId) userId.textContent = 'Гость_001';
+            }
+
+            initializeBonusCalendar() {
+                const calendar = document.getElementById('bonusCalendar');
+                if (!calendar) return;
+                
+                calendar.innerHTML = '';
+                
+                const today = new Date().getDay();
+                const dayIndex = today === 0 ? 6 : today - 1;
+                const dayNames = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
+                const canClaimToday = this.stateManager.canClaimDailyBonus();
+                
+                for (let i = 0; i < 7; i++) {
+                    const day = document.createElement('div');
+                    const bonusAmount = GAME_CONFIG.BONUSES.DAILY_BASE + (i * 10); // Уменьшены бонусы
+                    
+                    let dayClass = 'bonus-day';
+                    if (i === dayIndex) {
+                        dayClass += canClaimToday ? ' active' : ' claimed';
+                    } else if (i < dayIndex) {
+                        dayClass += ' claimed';
+                    } else {
+                        dayClass += ' future';
+                    }
+                    
+                    day.className = dayClass;
+                    day.innerHTML = `
+                        <div>${dayNames[i]}</div>
+                        <div class="day-reward">+${bonusAmount}🪙</div>
+                    `;
+                    calendar.appendChild(day);
+                }
+            }
+
+            updateUI() {
+                const state = this.stateManager.state;
+                
+                // Обновляем баланс
+                const coinsBalance = document.getElementById('coinsBalance');
+                const profileBalance = document.getElementById('profileBalance');
+                if (coinsBalance) coinsBalance.textContent = state.coins;
+                if (profileBalance) profileBalance.textContent = state.coins;
+                
+                // Обновляем статистику
+                const totalWins = document.getElementById('totalWins');
+                const totalSpins = document.getElementById('totalSpins');
+                const playerLevel = document.getElementById('playerLevel');
+                if (totalWins) totalWins.textContent = state.totalWins;
+                if (totalSpins) totalSpins.textContent = state.totalSpins;
+                if (playerLevel) playerLevel.textContent = state.level;
+                
+                // Обновляем уровень
+                const currentLevel = document.getElementById('currentLevel');
+                const levelBadge = document.getElementById('levelBadge');
+                if (currentLevel) currentLevel.textContent = state.level;
+                if (levelBadge) levelBadge.textContent = state.level;
+                
+                // Обновляем прогресс уровня
+                const expForNextLevel = this.stateManager.getExpForNextLevel();
+                const progress = (state.experience / expForNextLevel) * 100;
+                const levelProgressFill = document.getElementById('levelProgressFill');
+                const currentExp = document.getElementById('currentExp');
+                const nextLevelExp = document.getElementById('nextLevelExp');
+                
+                if (levelProgressFill) levelProgressFill.style.width = `${progress}%`;
+                if (currentExp) currentExp.textContent = state.experience;
+                if (nextLevelExp) nextLevelExp.textContent = expForNextLevel;
+                
+                // Обновляем кнопки бонусов
+                const firstGameBonusBtn = document.getElementById('firstGameBonusBtn');
+                const tenSpinsBonusBtn = document.getElementById('tenSpinsBonusBtn');
+                const claimDailyBonusBtn = document.getElementById('claimDailyBonusBtn');
+                
+                if (firstGameBonusBtn) {
+                    firstGameBonusBtn.disabled = state.firstGameBonusClaimed;
+                    firstGameBonusBtn.textContent = state.firstGameBonusClaimed ? 'ПОЛУЧЕНО' : 'ПОЛУЧИТЬ';
+                }
+                
+                if (tenSpinsBonusBtn) {
+                    tenSpinsBonusBtn.disabled = state.tenSpinsBonusClaimed || state.totalSpins < 10;
+                    tenSpinsBonusBtn.textContent = state.tenSpinsBonusClaimed ? 'ПОЛУЧЕНО' : 
+                        (state.totalSpins >= 10 ? 'ПОЛУЧИТЬ' : 'НЕДОСТУПНО');
+                }
+                
+                if (claimDailyBonusBtn) {
+                    const canClaimDaily = this.stateManager.canClaimDailyBonus();
+                    claimDailyBonusBtn.disabled = !canClaimDaily;
+                    claimDailyBonusBtn.textContent = canClaimDaily ? 'ПОЛУЧИТЬ БОНУС' : 'БОНУС ПОЛУЧЕН';
+                }
+            }
+
+            async saveGame() {
+                if (this.authSystem.userId) {
+                    try {
+                        await this.authSystem.saveGameData(this.stateManager);
+                    } catch (error) {
+                        console.error('Save game error:', error);
+                    }
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 3000);
+            }
+
+            toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) {
+                    themeToggle.innerHTML = newTheme === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+                }
+                
+                localStorage.setItem('casinoTheme', newTheme);
+            }
+
+            cleanup() {
+                this.crashGame.cleanup();
+            }
+        }
+
+        // Запуск приложения
+        const app = new App();
+        document.addEventListener('DOMContentLoaded', () => {
+            // Восстанавливаем тему
+            const savedTheme = localStorage.getItem('casinoTheme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+            }
+            
+            app.init();
+        });
+
+        // Очистка при закрытии
+        window.addEventListener('beforeunload', () => {
+            app.cleanup();
+        });
+    </script>
+</body>
+</html>
